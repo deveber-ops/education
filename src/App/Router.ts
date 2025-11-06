@@ -120,6 +120,10 @@ async function loadModuleConfig(moduleName: string): Promise<ModuleConfig | null
     const configTsPath = path.join(modulesPath, moduleName, 'config.ts');
     const configJsPath = path.join(modulesPath, moduleName, 'config.js');
 
+    console.log(`🔍 Looking for config in: ${moduleName}`);
+    console.log(`   TS path: ${configTsPath}`);
+    console.log(`   JS path: ${configJsPath}`);
+
     let configPath: string | null = null;
 
     if (fs.existsSync(configJsPath)) {
@@ -143,7 +147,7 @@ async function loadModuleConfig(moduleName: string): Promise<ModuleConfig | null
 
 export async function syncModulesWithConfigs(): Promise<void> {
     const moduleNames = fs.readdirSync(modulesPath).map(name =>
-        name[0].toUpperCase() + name.slice(1)
+        name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
     );
 
     for (const moduleName of moduleNames) {
