@@ -1,0 +1,1 @@
+ALTER TABLE `Blogs` DROP INDEX `blog_name_idx`;

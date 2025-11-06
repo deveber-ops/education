@@ -51,9 +51,9 @@ const UsersRepository = {
       const { password: _, ...userWithoutPassword } = user;
       return userWithoutPassword;
     } catch (error) {
-      if (error.message?.includes("user_login_idx")) {
+      if (error.cause.sqlMessage?.includes("user_login_idx")) {
         throw new repositoryUniqueError("\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C \u0441 \u0442\u0430\u043A\u0438\u043C \u043B\u043E\u0433\u0438\u043D\u043E\u043C \u0443\u0436\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442", "login");
-      } else if (error.message?.includes("user_email_idx")) {
+      } else if (error.cause.sqlMessage?.includes("user_email_idx")) {
         throw new repositoryUniqueError("\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C \u0441 \u0442\u0430\u043A\u0438\u043C email \u0443\u0436\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442", "email");
       }
       throw error;

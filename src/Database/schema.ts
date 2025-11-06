@@ -63,9 +63,9 @@ export const Blogs = mysqlTable('Blogs', {
     description: varchar('description', { length: 500 }).notNull(),
     websiteUrl: varchar('websiteUrl', { length: 100 }).notNull(),
     isMembership: boolean('isMembership').default(false),
-}, (table) => [
+})/*, (table) => [
     uniqueIndex('blog_name_idx').on(table.name)
-]);
+]);*/
 
 export const Posts = mysqlTable('Posts', {
     id: int('id').primaryKey().autoincrement(),

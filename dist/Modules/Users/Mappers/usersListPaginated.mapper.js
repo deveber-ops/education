@@ -5,7 +5,7 @@ function mapToUsersListPaginatedOutput(users, meta) {
     pageSize: Number(meta.pageSize),
     totalCount: Number(meta.totalCount),
     items: users.map((user) => ({
-      id: user.id,
+      id: toString(user.id),
       createdAt: user.createdAt,
       login: user.login,
       email: user.email

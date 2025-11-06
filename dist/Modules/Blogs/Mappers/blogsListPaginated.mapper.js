@@ -5,7 +5,7 @@ function mapToBlogListPaginatedOutput(blogs, meta) {
     pageSize: Number(meta.pageSize),
     totalCount: Number(meta.totalCount),
     items: blogs.map((blog) => ({
-      id: blog.id,
+      id: toString(blog.id),
       createdAt: blog.createdAt,
       name: blog.name,
       description: blog.description,

@@ -98,9 +98,9 @@ export const UsersRepository = {
             const { password: _, ...userWithoutPassword } = user;
             return userWithoutPassword;
         } catch (error: any) {
-            if (error.message?.includes('user_login_idx')) {
+            if (error.cause.sqlMessage?.includes('user_login_idx')) {
                 throw new repositoryUniqueError('Пользователь с таким логином уже существует', 'login');
-            } else if (error.message?.includes('user_email_idx')) {
+            } else if (error.cause.sqlMessage?.includes('user_email_idx')) {
                 throw new repositoryUniqueError('Пользователь с таким email уже существует', 'email');
             }
 

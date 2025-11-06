@@ -57,9 +57,7 @@ const Blogs = mysqlTable("Blogs", {
   description: varchar("description", { length: 500 }).notNull(),
   websiteUrl: varchar("websiteUrl", { length: 100 }).notNull(),
   isMembership: boolean("isMembership").default(false)
-}, (table) => [
-  uniqueIndex("blog_name_idx").on(table.name)
-]);
+});
 const Posts = mysqlTable("Posts", {
   id: int("id").primaryKey().autoincrement(),
   createdAt: datetime("createdAt").default(sql`CURRENT_TIMESTAMP`),
