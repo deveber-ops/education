@@ -11,7 +11,7 @@ export default {
         {
             method: 'DELETE',
             name: 'Удаление всех данных',
-            path: `/all-data/`,
+            path: `/all-data`,
             middlewares: [],
             handler: async (req: Request, res: Response, next: NextFunction) => {
                 const db = database.getDB();
