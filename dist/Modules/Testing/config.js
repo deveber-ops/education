@@ -9,6 +9,7 @@ var config_default = {
     {
       method: "DELETE",
       name: "\u0423\u0434\u0430\u043B\u0435\u043D\u0438\u0435 \u0432\u0441\u0435\u0445 \u0434\u0430\u043D\u043D\u044B\u0445",
+      path: `/all-data/`,
       middlewares: [],
       handler: async (req, res, next) => {
         const db = database.getDB();
