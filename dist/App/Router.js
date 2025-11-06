@@ -9,7 +9,7 @@ import { ModulesRepository } from '../Modules/Modules/Repositories/modules.repos
 import { authMiddleware } from '../Modules/Auth/Middlewares/auth.middleware.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const modulesPath = path.resolve(__dirname, "../modules");
+const modulesPath = path.resolve(__dirname, "../Modules");
 const router = express.Router();
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));

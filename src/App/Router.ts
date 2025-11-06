@@ -49,7 +49,7 @@ interface AggregatedConfig {
     }[];
 }
 
-const modulesPath = path.resolve(__dirname, '../modules');
+const modulesPath = path.resolve(__dirname, '../Modules');
 const router = express.Router();
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
