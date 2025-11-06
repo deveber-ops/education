@@ -19,7 +19,6 @@ export default {
                     await db.delete(Comments).execute();
                     await db.delete(Posts).execute();
                     await db.delete(Blogs).execute();
-                    await db.delete(Users).execute();
                     res.sendStatus(HttpStatus.NoContent);
                 } catch (error) {
                     next(error);
