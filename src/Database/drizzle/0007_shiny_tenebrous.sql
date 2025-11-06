@@ -1,0 +1,2 @@
+ALTER TABLE `Comments` ADD `postId` int NOT NULL;--> statement-breakpoint
+ALTER TABLE `Comments` ADD CONSTRAINT `Comments_postId_Posts_id_fk` FOREIGN KEY (`postId`) REFERENCES `Posts`(`id`) ON DELETE cascade ON UPDATE no action;

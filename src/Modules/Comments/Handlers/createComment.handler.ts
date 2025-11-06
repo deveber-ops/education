@@ -1,0 +1,32 @@
+import {Request, Response, NextFunction} from "express";
+import {HttpStatus} from "../../../Core/Types/httpStatuses.enum";
+import {CommentInputType} from "../Types/comment.types";
+import {authError} from "../../../Core/Errors/auth.errors";
+import {UsersService} from "../../Users/Services/users.service";
+import {UserInfoType} from "../../Users/Types/user.types";
+import {CommentsRepository} from "../Repositories/comments.repository";
+
+export async function createCommentHandler (req: Request<{ postId: string }, {}, { commentData: CommentInputType }>, res: Response, next: NextFunction ) {
+    try {
+        const postId = parseInt(req.params.postId, 10)
+
+        const userId = req.userId;
+        if (!userId) return new authError('Не авторизован', 'auth')
+        const userInfo:UserInfoType = await UsersService.findOne(userId);
+
+        const commentData = {
+            ...req.body.commentData,
+            postId,
+            commentatorInfo: {
+                userId: userInfo.id,
+                userLogin: userInfo.login
+            }
+        }
+
+        const createdComment = await CommentsRepository.create(commentData);
+
+        res.status(HttpStatus.Created).send(createdComment)
+    } catch (error) {
+        next(error);
+    }
+}

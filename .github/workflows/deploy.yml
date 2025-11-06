@@ -1,0 +1,96 @@
+name: Deploy to Hosting
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Ensure temp dist folder exists
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.HOSTER_SSH_HOST }}
+          username: ${{ secrets.HOSTER_SSH_USER }}
+          key: ${{ secrets.HOSTER_SSH_KEY }}
+          script: |
+            mkdir -p /home/${{ secrets.HOSTER_SSH_USER }}/__temp_dist
+
+      - name: Upload dist folder via SCP
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOSTER_SSH_HOST }}
+          username: ${{ secrets.HOSTER_SSH_USER }}
+          key: ${{ secrets.HOSTER_SSH_KEY }}
+          source: "dist"
+          target: "/home/${{ secrets.HOSTER_SSH_USER }}/__temp_dist"
+          strip_components: 1
+          overwrite: true
+
+      - name: Sync dist to project root with exclusions
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.HOSTER_SSH_HOST }}
+          username: ${{ secrets.HOSTER_SSH_USER }}
+          key: ${{ secrets.HOSTER_SSH_KEY }}
+          script: |
+            echo "🧹 Синхронизация dist → корень проекта с исключениями..."
+            rsync -av --delete \
+            --exclude='*.d.ts' \
+            --exclude='*.d.ts.map' \
+            --exclude='*.map' \
+            --exclude='node_modules' \
+              /home/${{ secrets.HOSTER_SSH_USER }}/__temp_dist/ \
+              ${{ secrets.HOSTER_SSH_PATH }}/
+
+            rm -rf /home/${{ secrets.HOSTER_SSH_USER }}/__temp_dist
+
+      - name: Reinstall dependencies and generate drizzle client
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.HOSTER_SSH_HOST }}
+          username: ${{ secrets.HOSTER_SSH_USER }}
+          key: ${{ secrets.HOSTER_SSH_KEY }}
+          script: |
+            echo "🧹 Удаление зависимостей..."
+            cloudlinux-selector run-script \
+            --json \
+            --interpreter nodejs \
+            --user ${{ secrets.HOSTER_SSH_USER }} \
+            --app-root ${{ secrets.HOSTER_SSH_PATH }} \
+            --script-name clean
+            
+            echo "📦 Установка production-зависимостей..."
+            cloudlinux-selector run-script \
+            --json \
+            --interpreter nodejs \
+            --user ${{ secrets.HOSTER_SSH_USER }} \
+            --app-root ${{ secrets.HOSTER_SSH_PATH }} \
+            --script-name setup
+            
+            echo "📦 Установка production-зависимостей..."
+            cloudlinux-selector run-script \
+            --json \
+            --interpreter nodejs \
+            --user ${{ secrets.HOSTER_SSH_USER }} \
+            --app-root ${{ secrets.HOSTER_SSH_PATH }} \
+            --script-name dbGenerate
+
+      - name: Restart application
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.HOSTER_SSH_HOST }}
+          username: ${{ secrets.HOSTER_SSH_USER }}
+          key: ${{ secrets.HOSTER_SSH_KEY }}
+          script: |
+            echo "🔄 Перезапуск приложения..."
+            cloudlinux-selector restart \
+              --interpreter nodejs \
+              --user ${{ secrets.HOSTER_SSH_USER }} \
+              --app-root ${{ secrets.HOSTER_SSH_PATH }} \
+              --json

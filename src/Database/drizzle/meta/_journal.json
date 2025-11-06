@@ -1,0 +1,62 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1762335041052,
+      "tag": "0000_free_risque",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1762338158176,
+      "tag": "0001_naive_cardiac",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1762420887929,
+      "tag": "0002_odd_monster_badoon",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1762429248152,
+      "tag": "0003_dashing_iron_lad",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1762440127807,
+      "tag": "0004_needy_anita_blake",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1762446055205,
+      "tag": "0005_dark_captain_universe",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1762446657981,
+      "tag": "0006_futuristic_multiple_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1762447094805,
+      "tag": "0007_shiny_tenebrous",
+      "breakpoints": true
+    }
+  ]
+}
