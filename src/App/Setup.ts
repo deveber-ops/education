@@ -20,21 +20,6 @@ export const setupApp = async (app: Express) => {
     const { router } = await loadRoutes();
     app.use(router);
 
-    app.use('/api/testing/all-data', async (req: Request, res: Response, next: NextFunction) => {
-        const db = database.getDB();
-
-        try {
-            await db.delete(Comments).execute();
-            await db.delete(Posts).execute();
-            await db.delete(Users).execute();
-            await db.delete(Blogs).execute();
-
-            res.sendStatus(HttpStatus.NoContent);
-        } catch (error) {
-            next(error);
-        }
-    });
-
     app.use(errorsMiddleware);
 
     return app;
