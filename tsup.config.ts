@@ -105,7 +105,8 @@ export default defineConfig({
                 author: backendPackageJson.author,
                 main: 'App.js',
                 scripts: {
-                    start: "node App.js"
+                    start: "node App.js",
+                    dbGenerate: "npm drizzle-kit generate"
                 }
             };
 
