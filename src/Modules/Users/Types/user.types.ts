@@ -1,6 +1,7 @@
 import {InferInsertModel, InferSelectModel} from "drizzle-orm";
 import {Users} from "../../../Database/schema";
 import {SortDirection} from "../../../Core/Types/sortDirections.type";
+import {Blog} from "../../Blogs/Types/blog.types";
 
 export enum UserSortFields {
     CreatedAt = "createdAt",
@@ -13,6 +14,7 @@ export enum UserSearchFields {
 
 export type User = InferSelectModel<typeof Users>;
 export type UserWithoutPassword = Omit<User, 'password'>;
+export type UserWithStringId = Omit<UserWithoutPassword, 'id'> & { id: string };
 export type UserInputType = InferInsertModel<typeof Users>;
 export type UserInfoType = Omit<UserWithoutPassword, 'createdAt'>;
 
@@ -30,5 +32,5 @@ export type UsersListPaginatedOutput = {
     pagesCount: number;
     pageSize: number;
     totalCount: number;
-    items: UserWithoutPassword[];
+    items: UserWithStringId[];
 };

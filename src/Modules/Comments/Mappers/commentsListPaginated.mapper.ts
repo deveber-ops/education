@@ -10,7 +10,7 @@ export function mapToCommentListPaginatedOutput(
         pageSize: Number(meta.pageSize),
         totalCount: Number(meta.totalCount),
         items: comments.map((comment) => ({
-            id: toString(comment.id),
+            id: comment.id.toString(),
             createdAt: comment.createdAt,
             content: comment.content,
             commentatorInfo: {

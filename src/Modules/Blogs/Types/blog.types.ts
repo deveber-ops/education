@@ -11,6 +11,7 @@ export enum BlogSearchFields {
 }
 
 export type Blog = InferSelectModel<typeof Blogs>;
+export type BlogWithStringId = Omit<Blog, 'id'> & { id: string };
 export type BlogInputType = InferInsertModel<typeof Blogs>;
 
 export type BlogQueryInput = {
@@ -26,5 +27,5 @@ export type BlogsListPaginatedOutput = {
     pagesCount: number;
     pageSize: number;
     totalCount: number;
-    items: Blog[];
+    items: BlogWithStringId[];
 };

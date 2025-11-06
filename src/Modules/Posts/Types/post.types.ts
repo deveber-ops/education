@@ -7,6 +7,7 @@ export enum PostSortFields {
 }
 
 export type Post = InferSelectModel<typeof Posts>;
+export type PostWithStringId = Omit<Post, 'id'> & { id: string };
 export type PostInputType = InferInsertModel<typeof Posts>;
 
 export type PostQueryInput = {
@@ -21,5 +22,5 @@ export type PostsListPaginatedOutput = {
     pagesCount: number;
     pageSize: number;
     totalCount: number;
-    items: Post[];
+    items: PostWithStringId[];
 };
