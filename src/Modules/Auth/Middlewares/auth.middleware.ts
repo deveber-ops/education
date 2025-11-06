@@ -50,6 +50,8 @@ export const authMiddleware = async (
         if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
             next(new authError('Не авторизован.', 'token'))
         }
+
+        next()
     } else {
         try {
             const payload = jwt.verify(accessToken, ACCESS_TOKEN_SECRET) as any;

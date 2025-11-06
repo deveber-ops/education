@@ -31,6 +31,7 @@ const authMiddleware = async (req, res, next) => {
     if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
       next(new authError("\u041D\u0435 \u0430\u0432\u0442\u043E\u0440\u0438\u0437\u043E\u0432\u0430\u043D.", "token"));
     }
+    next();
   } else {
     try {
       const payload = jwt.verify(accessToken, ACCESS_TOKEN_SECRET);
