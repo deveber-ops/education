@@ -146,17 +146,15 @@ async function loadModuleConfig(moduleName: string): Promise<ModuleConfig | null
 }
 
 export async function syncModulesWithConfigs(): Promise<void> {
-    const moduleNames = fs.readdirSync(modulesPath).map(name =>
-        name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
-    );
+    const moduleNames = fs.readdirSync(modulesPath)
 
     for (const moduleName of moduleNames) {
-        const config = await loadModuleConfig(moduleName);
+        const config = await loadModuleConfig(moduleName.charAt(0).toUpperCase() + moduleName.slice(1).toLowerCase());
         if (config) {
             const existingModule = await ModulesRepository.getModuleByName(config.name);
 
             const compatibleConfig = {
-                name: config.name,
+                name: config.name.charAt(0).toUpperCase() + config.name.slice(1).toLowerCase(),
                 path: config.path,
                 system: config.system,
                 label: config.label ?? existingModule?.label ?? config.name,
