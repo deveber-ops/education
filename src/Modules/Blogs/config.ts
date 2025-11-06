@@ -14,6 +14,10 @@ import {
     postInputValidationWidhoutBlogId
 } from "../Posts/Middlewares/postInput.validation.middleware";
 import {createPostHandler} from "../Posts/Handlers/createPost.handler";
+import database from "../../Database/database";
+import {Blogs} from "../../Database/schema";
+import {HttpStatus} from "../../Core/Types/httpStatuses.enum";
+import {Request, Response, NextFunction} from "express";
 
 export default {
     name: 'blogs',

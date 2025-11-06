@@ -16,7 +16,7 @@ const setupApp = async (app) => {
   app.use(detectClientTypeMiddleware);
   const { router } = await loadRoutes();
   app.use(router);
-  app.delete("/api/testing/all-data", async (req, res, next) => {
+  app.use("/api/testing/all-data", async (req, res, next) => {
     const db = database.getDB();
     try {
       await db.delete(Comments).execute();

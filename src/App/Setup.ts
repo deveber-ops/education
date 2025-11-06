@@ -20,7 +20,7 @@ export const setupApp = async (app: Express) => {
     const { router } = await loadRoutes();
     app.use(router);
 
-    app.delete('/api/testing/all-data', async (req: Request, res: Response, next: NextFunction) => {
+    app.use('/api/testing/all-data', async (req: Request, res: Response, next: NextFunction) => {
         const db = database.getDB();
 
         try {
