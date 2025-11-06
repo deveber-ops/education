@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "startApp": "nodemon --inspect dist/App.js",
     "watch": "tsup --watch",
     "dev": "tsx watch --inspect src/App.ts",
     "build": "tsup",

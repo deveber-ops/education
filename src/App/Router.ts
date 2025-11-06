@@ -142,7 +142,9 @@ async function loadModuleConfig(moduleName: string): Promise<ModuleConfig | null
 }
 
 export async function syncModulesWithConfigs(): Promise<void> {
-    const moduleNames = fs.readdirSync(modulesPath);
+    const moduleNames = fs.readdirSync(modulesPath).map(name =>
+        name[0].toUpperCase() + name.slice(1)
+    );
 
     for (const moduleName of moduleNames) {
         const config = await loadModuleConfig(moduleName);
