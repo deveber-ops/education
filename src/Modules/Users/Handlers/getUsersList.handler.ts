@@ -6,7 +6,6 @@ import {mapToUsersListPaginatedOutput} from "../Mappers/usersListPaginated.mappe
 
 export async function getUsersListHandler (req: Request, res: Response, next: NextFunction) {
     try {
-
         const queryInput = setSortAndPagination(req.query)
 
         const { items, totalCount } = await UsersService.findMany(<UserQueryInput>queryInput)

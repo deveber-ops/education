@@ -1,4 +1,4 @@
-import { and, like, or, eq, desc, asc } from "drizzle-orm";
+import { and, like, or, eq, desc, asc, sql } from "drizzle-orm";
 const buildSearchConditions = (table, options) => {
   const { search, searchFields } = options;
   if (!search || !searchFields || searchFields.length === 0) {
@@ -49,10 +49,15 @@ const buildPagination = (pageNumber = 1, pageSize = 10) => {
   const skip = (parsedPageNumber - 1) * parsedPageSize;
   return { limit: parsedPageSize, offset: skip };
 };
-const buildOrderBy = (table, sortBy = "id", sortDirection = "asc") => {
+const buildOrderBy = (table, sortBy, sortDirection) => {
   const column = table[sortBy];
   if (!column) {
     throw new Error(`Column ${sortBy} not found in table`);
+  }
+  const stringColumnTypes = ["MySqlVarChar", "MySqlText", "MySqlChar"];
+  if (stringColumnTypes.includes(column.columnType)) {
+    const caseInsensitiveColumn = sql`${column} COLLATE utf8mb4_unicode_ci`;
+    return sortDirection === "desc" ? desc(caseInsensitiveColumn) : asc(caseInsensitiveColumn);
   }
   return sortDirection === "desc" ? desc(column) : asc(column);
 };

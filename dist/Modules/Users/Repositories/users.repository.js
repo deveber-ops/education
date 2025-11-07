@@ -17,6 +17,7 @@ const UsersRepository = {
       sortDirection,
       ...searchFilters
     } = queryDto;
+    console.log(sortDirection);
     const searchFieldsMapping = createSearchMapping(UserSearchFields);
     const db = database.getDB();
     const pagination = buildPagination(pageNumber, pageSize);
@@ -34,7 +35,6 @@ const UsersRepository = {
     if (whereConditions) {
       countQuery = countQuery.where(whereConditions);
     }
-    console.log(whereConditions);
     const totalCountResult = await countQuery;
     const totalCount = totalCountResult[0]?.count || 0;
     return { items, totalCount };

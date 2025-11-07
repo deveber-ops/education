@@ -1,4 +1,4 @@
-import {SQL, and, like, or, eq, desc, asc} from "drizzle-orm";
+import {SQL, and, like, or, eq, desc, asc, sql} from "drizzle-orm";
 import { AnyMySqlTable, MySqlColumn } from "drizzle-orm/mysql-core";
 
 export interface SearchOptions {
@@ -90,11 +90,27 @@ export const buildPagination = (pageNumber: any = 1, pageSize: any = 10) => {
 };
 
 // Утилита для сортировки
-export const buildOrderBy = (table: AnyMySqlTable, sortBy: string = 'id', sortDirection: 'asc' | 'desc' = 'asc') => {
+export const buildOrderBy = (
+    table: AnyMySqlTable,
+    sortBy: string,
+    sortDirection: 'asc' | 'desc',
+) => {
     const column = table[sortBy as keyof typeof table] as MySqlColumn | undefined;
+
     if (!column) {
         throw new Error(`Column ${sortBy} not found in table`);
     }
+
+    // Определяем строковые типы данных
+    const stringColumnTypes = ['MySqlVarChar', 'MySqlText', 'MySqlChar'];
+
+    // Если колонка строкового типа - делаем case-insensitive
+    if (stringColumnTypes.includes(column.columnType)) {
+        const caseInsensitiveColumn = sql`${column} COLLATE utf8mb4_unicode_ci`;
+        return sortDirection === 'desc' ? desc(caseInsensitiveColumn) : asc(caseInsensitiveColumn);
+    }
+
+    // Для остальных колонок обычная сортировка
     return sortDirection === 'desc' ? desc(column) : asc(column);
 };
 

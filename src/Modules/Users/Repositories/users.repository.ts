@@ -24,6 +24,8 @@ export const UsersRepository = {
             ...searchFilters
         } = queryDto;
 
+        console.log(sortDirection)
+
         const searchFieldsMapping = createSearchMapping(UserSearchFields);
 
         const db = database.getDB();
@@ -52,8 +54,6 @@ export const UsersRepository = {
         if (whereConditions) {
             countQuery = countQuery.where(whereConditions);
         }
-
-        console.log(whereConditions)
 
         const totalCountResult = await countQuery;
         const totalCount = totalCountResult[0]?.count || 0;
