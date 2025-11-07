@@ -1,5 +1,3 @@
-import {paginationAndSortingValidation} from "../../Core/Middlewares/querySortAndPagination.validation.middleware";
-import {BlogSortFields} from "./Types/blog.types";
 import {validationMiddleware} from "../../Core/Errors/validation.middleware";
 import {getBlogsListHandler} from "./Handlers/getBlogsList.handler";
 import {idValidation} from "../../Core/Middlewares/idValidation.middleware";
@@ -9,15 +7,10 @@ import {deleteBlogHandler} from "./Handlers/deleteBlog.handler";
 import {getBlogHandler} from "./Handlers/getBlog.handler";
 import {updateBlogHandler} from "./Handlers/updateBlog.handler";
 import {getPostsListHandler} from "../Posts/Handlers/getPostsList.handler";
-import {PostSortFields} from "../Posts/Types/post.types";
 import {
     postInputValidationWidhoutBlogId
 } from "../Posts/Middlewares/postInput.validation.middleware";
 import {createPostHandler} from "../Posts/Handlers/createPost.handler";
-import database from "../../Database/database";
-import {Blogs} from "../../Database/schema";
-import {HttpStatus} from "../../Core/Types/httpStatuses.enum";
-import {Request, Response, NextFunction} from "express";
 
 export default {
     name: 'blogs',
@@ -28,7 +21,7 @@ export default {
             method: 'GET',
             name: 'Получение списка блогов',
             path: '/',
-            middlewares: [paginationAndSortingValidation(BlogSortFields) ,validationMiddleware],
+            middlewares: [],
             handler: getBlogsListHandler,
             authorization: false
         },
@@ -44,7 +37,7 @@ export default {
             method: 'GET',
             name: 'Получение постов блога',
             path: '/:blogId/posts',
-            middlewares: [paginationAndSortingValidation(PostSortFields), validationMiddleware],
+            middlewares: [],
             handler: getPostsListHandler,
             authorization: false
         },

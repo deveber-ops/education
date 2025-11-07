@@ -1,5 +1,3 @@
-import {paginationAndSortingValidation} from "../../Core/Middlewares/querySortAndPagination.validation.middleware";
-import {PostSortFields} from "./Types/post.types";
 import {validationMiddleware} from "../../Core/Errors/validation.middleware";
 import {getPostsListHandler} from "./Handlers/getPostsList.handler";
 import {idValidation} from "../../Core/Middlewares/idValidation.middleware";
@@ -8,7 +6,6 @@ import {postInputValidation} from "./Middlewares/postInput.validation.middleware
 import {createPostHandler} from "./Handlers/createPost.handler";
 import {updatePostHandler} from "./Handlers/updatePost.handler";
 import {deletePostHandler} from "./Handlers/deletePost.handler";
-import {CommentSortFields} from "../Comments/Types/comment.types";
 import {getCommentsListHandler} from "../Comments/Handlers/getCommentsList.handler";
 import {commentInputValidation} from "../Comments/Middlewares/commentInput.validation.middleware";
 import {createCommentHandler} from "../Comments/Handlers/createComment.handler";
@@ -22,7 +19,7 @@ export default {
             method: 'GET',
             name: 'Получение списка постов',
             path: '/',
-            middlewares: [paginationAndSortingValidation(PostSortFields) ,validationMiddleware],
+            middlewares: [],
             handler: getPostsListHandler,
             authorization: false
         },
@@ -38,7 +35,7 @@ export default {
             method: 'GET',
             name: 'Получение комментариев поста',
             path: '/:postId/comments',
-            middlewares: [paginationAndSortingValidation(CommentSortFields), validationMiddleware],
+            middlewares: [],
             handler: getCommentsListHandler,
             authorization: false
         },

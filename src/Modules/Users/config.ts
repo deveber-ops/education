@@ -5,8 +5,6 @@ import {createUserHandler} from "./Handlers/createUser.handler";
 import {idValidation} from "../../Core/Middlewares/idValidation.middleware";
 import {getUserHandler} from "./Handlers/getUser.handler";
 import {deleteUserHandler} from "./Handlers/deleteUser.handler";
-import {paginationAndSortingValidation} from "../../Core/Middlewares/querySortAndPagination.validation.middleware";
-import {UserSortFields} from "./Types/user.types";
 
 export default {
     name: 'users',
@@ -17,7 +15,7 @@ export default {
             method: 'GET',
             name: 'Получение списка пользователей',
             path: '/',
-            middlewares: [paginationAndSortingValidation(UserSortFields) ,validationMiddleware],
+            middlewares: [],
             handler: getUsersListHandler,
         },
         {

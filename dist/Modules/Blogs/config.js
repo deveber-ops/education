@@ -1,5 +1,3 @@
-import { paginationAndSortingValidation } from '../../Core/Middlewares/querySortAndPagination.validation.middleware.js';
-import { BlogSortFields } from './Types/blog.types.js';
 import { validationMiddleware } from '../../Core/Errors/validation.middleware.js';
 import { getBlogsListHandler } from './Handlers/getBlogsList.handler.js';
 import { idValidation } from '../../Core/Middlewares/idValidation.middleware.js';
@@ -9,7 +7,6 @@ import { deleteBlogHandler } from './Handlers/deleteBlog.handler.js';
 import { getBlogHandler } from './Handlers/getBlog.handler.js';
 import { updateBlogHandler } from './Handlers/updateBlog.handler.js';
 import { getPostsListHandler } from '../Posts/Handlers/getPostsList.handler.js';
-import { PostSortFields } from '../Posts/Types/post.types.js';
 import {
   postInputValidationWidhoutBlogId
 } from '../Posts/Middlewares/postInput.validation.middleware.js';
@@ -23,7 +20,7 @@ var config_default = {
       method: "GET",
       name: "\u041F\u043E\u043B\u0443\u0447\u0435\u043D\u0438\u0435 \u0441\u043F\u0438\u0441\u043A\u0430 \u0431\u043B\u043E\u0433\u043E\u0432",
       path: "/",
-      middlewares: [paginationAndSortingValidation(BlogSortFields), validationMiddleware],
+      middlewares: [],
       handler: getBlogsListHandler,
       authorization: false
     },
@@ -39,7 +36,7 @@ var config_default = {
       method: "GET",
       name: "\u041F\u043E\u043B\u0443\u0447\u0435\u043D\u0438\u0435 \u043F\u043E\u0441\u0442\u043E\u0432 \u0431\u043B\u043E\u0433\u0430",
       path: "/:blogId/posts",
-      middlewares: [paginationAndSortingValidation(PostSortFields), validationMiddleware],
+      middlewares: [],
       handler: getPostsListHandler,
       authorization: false
     },
