@@ -1,8 +1,15 @@
 import bcrypt from 'bcrypt';
 import {eq, or, sql} from 'drizzle-orm';
-import {User, UserInputType, UserQueryInput, UserWithoutPassword, UserWithStringId} from "../Types/user.types";
+import {
+    User,
+    UserInputType,
+    UserQueryInput,
+    UserSearchFields,
+    UserWithoutPassword,
+    UserWithStringId
+} from "../Types/user.types";
 import database from "../../../Database/database";
-import {buildOrderBy, buildPagination, buildWhereConditions} from "../../../Database/utils";
+import {buildOrderBy, buildPagination, buildWhereConditions, createSearchMapping} from "../../../Database/utils";
 import {Users} from "../../../Database/schema";
 import {repositoryNotFoundError, repositoryUniqueError} from "../../../Core/Errors/repository.errors";
 import {toStringKeys} from "../../../Core/Helpers/idToString.helper";
@@ -14,44 +21,41 @@ export const UsersRepository = {
             pageSize,
             sortBy,
             sortDirection,
-            searchEmailTerm,
-            searchLoginTerm,
+            ...searchFilters
         } = queryDto;
+
+        const searchFieldsMapping = createSearchMapping(UserSearchFields);
 
         const db = database.getDB();
 
-        // Создаем search строку из терминов поиска
-        const search = searchEmailTerm || searchLoginTerm ?
-            [searchEmailTerm, searchLoginTerm].filter(Boolean).join(' ') :
-            undefined;
-
-        // Построение условий WHERE
-        const whereConditions = buildWhereConditions(Users, {
-            search,
-            searchFields: ['email', 'login'],
-        });
-
-        // Построение пагинации
         const pagination = buildPagination(pageNumber, pageSize);
-
-        // Построение порядка сортировки
         const orderBy = buildOrderBy(Users, sortBy, sortDirection);
 
-        // Получение пользователей
-        const items = await db
-            .select()
-            .from(Users)
-            .where(whereConditions)
+        const whereConditions = buildWhereConditions(Users, {
+            searchFieldsMapping,
+            filters: searchFilters,
+        });
+
+        let query = db.select().from(Users);
+
+        if (whereConditions) {
+            query = query.where(whereConditions);
+        }
+
+        const items = await query
             .orderBy(orderBy)
             .limit(pagination.limit)
             .offset(pagination.offset);
 
-        // Получение общего количества
-        const totalCountResult = await db
-            .select({ count: sql<number>`count(*)` })
-            .from(Users)
-            .where(whereConditions);
+        let countQuery = db.select({ count: sql<number>`count(*)` }).from(Users);
 
+        if (whereConditions) {
+            countQuery = countQuery.where(whereConditions);
+        }
+
+        console.log(whereConditions)
+
+        const totalCountResult = await countQuery;
         const totalCount = totalCountResult[0]?.count || 0;
 
         return { items, totalCount };

@@ -1,7 +1,10 @@
 import bcrypt from "bcrypt";
 import { eq, or, sql } from "drizzle-orm";
+import {
+  UserSearchFields
+} from '../Types/user.types.js';
 import database from '../../../Database/database.js';
-import { buildOrderBy, buildPagination, buildWhereConditions } from '../../../Database/utils.js';
+import { buildOrderBy, buildPagination, buildWhereConditions, createSearchMapping } from '../../../Database/utils.js';
 import { Users } from '../../../Database/schema.js';
 import { repositoryNotFoundError, repositoryUniqueError } from '../../../Core/Errors/repository.errors.js';
 import { toStringKeys } from '../../../Core/Helpers/idToString.helper.js';
@@ -12,19 +15,27 @@ const UsersRepository = {
       pageSize,
       sortBy,
       sortDirection,
-      searchEmailTerm,
-      searchLoginTerm
+      ...searchFilters
     } = queryDto;
+    const searchFieldsMapping = createSearchMapping(UserSearchFields);
     const db = database.getDB();
-    const search = searchEmailTerm || searchLoginTerm ? [searchEmailTerm, searchLoginTerm].filter(Boolean).join(" ") : void 0;
-    const whereConditions = buildWhereConditions(Users, {
-      search,
-      searchFields: ["email", "login"]
-    });
     const pagination = buildPagination(pageNumber, pageSize);
     const orderBy = buildOrderBy(Users, sortBy, sortDirection);
-    const items = await db.select().from(Users).where(whereConditions).orderBy(orderBy).limit(pagination.limit).offset(pagination.offset);
-    const totalCountResult = await db.select({ count: sql`count(*)` }).from(Users).where(whereConditions);
+    const whereConditions = buildWhereConditions(Users, {
+      searchFieldsMapping,
+      filters: searchFilters
+    });
+    let query = db.select().from(Users);
+    if (whereConditions) {
+      query = query.where(whereConditions);
+    }
+    const items = await query.orderBy(orderBy).limit(pagination.limit).offset(pagination.offset);
+    let countQuery = db.select({ count: sql`count(*)` }).from(Users);
+    if (whereConditions) {
+      countQuery = countQuery.where(whereConditions);
+    }
+    console.log(whereConditions);
+    const totalCountResult = await countQuery;
     const totalCount = totalCountResult[0]?.count || 0;
     return { items, totalCount };
   },

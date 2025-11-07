@@ -32,24 +32,43 @@ export const buildSearchConditions = (
     return conditions.length > 0 ? or(...conditions) : undefined;
 };
 
+export interface WhereBuilderOptions {
+    searchFieldsMapping?: Record<string, string>;
+    filters?: Record<string, any>;
+}
+
 export const buildWhereConditions = (
     table: AnyMySqlTable,
     options: WhereBuilderOptions
 ): SQL | undefined => {
     const conditions: SQL[] = [];
-    const { search, searchFields, filters } = options;
+    const { searchFieldsMapping, filters } = options;
 
-    // Добавляем поисковые условия
-    if (search && searchFields && searchFields.length > 0) {
-        const searchCondition = buildSearchConditions(table, { search, searchFields });
-        if (searchCondition) {
-            conditions.push(searchCondition);
+    if (searchFieldsMapping) {
+        const searchConditions: SQL[] = [];
+
+        Object.entries(searchFieldsMapping).forEach(([queryParam, tableColumn]) => {
+            const searchValue = filters?.[queryParam];
+
+            if (searchValue && typeof searchValue === 'string') {
+                const column = table[tableColumn as keyof typeof table] as MySqlColumn | undefined;
+                if (column) {
+                    searchConditions.push(like(column, `%${searchValue}%`));
+                }
+            }
+        });
+
+        if (searchConditions.length > 0) {
+            conditions.push(<SQL<unknown>>or(...searchConditions));
         }
     }
 
-    // Добавляем фильтры
     if (filters) {
         Object.entries(filters).forEach(([key, value]) => {
+            if (searchFieldsMapping && key in searchFieldsMapping) {
+                return;
+            }
+
             if (value !== undefined && value !== null) {
                 const column = table[key as keyof typeof table] as MySqlColumn | undefined;
                 if (column) {
@@ -62,10 +81,12 @@ export const buildWhereConditions = (
     return conditions.length > 0 ? and(...conditions) : undefined;
 };
 
-// Утилита для пагинации
-export const buildPagination = (pageNumber: number, pageSize: number) => {
-    const skip = (pageNumber - 1) * pageSize;
-    return { limit: pageSize, offset: skip };
+export const buildPagination = (pageNumber: any = 1, pageSize: any = 10) => {
+    const parsedPageNumber = Math.max(1, parseInt(String(pageNumber)) || 1);
+    const parsedPageSize = Math.max(1, Math.min(100, parseInt(String(pageSize)) || 10));
+
+    const skip = (parsedPageNumber - 1) * parsedPageSize;
+    return { limit: parsedPageSize, offset: skip };
 };
 
 // Утилита для сортировки
@@ -76,3 +97,10 @@ export const buildOrderBy = (table: AnyMySqlTable, sortBy: string = 'id', sortDi
     }
     return sortDirection === 'desc' ? desc(column) : asc(column);
 };
+
+export function createSearchMapping<T extends Record<string, string>>(searchFields: T): Record<string, string> {
+    return Object.entries(searchFields).reduce((acc, [tableColumn, queryParam]) => {
+        acc[queryParam] = tableColumn;
+        return acc;
+    }, {} as Record<string, string>);
+}

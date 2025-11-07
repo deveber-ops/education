@@ -19,7 +19,8 @@ export type BlogQueryInput = {
     pageSize?: number;
     sortBy?: BlogSortFields;
     sortDirection?: SortDirection;
-    searchNameTerm?: string;
+} & {
+    [K in keyof typeof BlogSearchFields as typeof BlogSearchFields[K]]?: string;
 };
 
 export type BlogsListPaginatedOutput = {

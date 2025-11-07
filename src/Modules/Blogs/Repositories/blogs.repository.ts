@@ -1,8 +1,8 @@
 import {eq, sql} from 'drizzle-orm';
 import database from "../../../Database/database";
-import {Blogs, Users} from "../../../Database/schema";
-import {buildOrderBy, buildPagination, buildWhereConditions} from "../../../Database/utils";
-import {Blog, BlogInputType, BlogQueryInput, BlogWithStringId} from "../Types/blog.types";
+import {Blogs} from "../../../Database/schema";
+import {buildOrderBy, buildPagination, buildWhereConditions, createSearchMapping} from "../../../Database/utils";
+import {Blog, BlogInputType, BlogQueryInput, BlogSearchFields, BlogWithStringId} from "../Types/blog.types";
 import {repositoryNotFoundError, repositoryUniqueError} from "../../../Core/Errors/repository.errors";
 import {toStringKeys} from "../../../Core/Helpers/idToString.helper";
 
@@ -13,37 +13,39 @@ export const BlogsRepository = {
             pageSize,
             sortBy,
             sortDirection,
-            searchNameTerm,
+            ...searchFilters
         } = queryDto;
 
         const db = database.getDB();
 
-        const search = searchNameTerm ?
-            [searchNameTerm].filter(Boolean).join(' ') :
-            undefined;
-
-        const whereConditions = buildWhereConditions(Users, {
-            search,
-            searchFields: ['name'],
-        });
-
         const pagination = buildPagination(pageNumber, pageSize);
-
         const orderBy = buildOrderBy(Blogs, sortBy, sortDirection);
 
-        const items = await db
-            .select()
-            .from(Blogs)
-            .where(whereConditions)
+        const searchFieldsMapping = createSearchMapping(BlogSearchFields);
+
+        const whereConditions = buildWhereConditions(Blogs, {
+            searchFieldsMapping,
+            filters: searchFilters,
+        });
+
+        let query = db.select().from(Blogs);
+
+        if (whereConditions) {
+            query = query.where(whereConditions);
+        }
+
+        const items = await query
             .orderBy(orderBy)
             .limit(pagination.limit)
             .offset(pagination.offset);
 
-        const totalCountResult = await db
-            .select({ count: sql<number>`count(*)` })
-            .from(Blogs)
-            .where(whereConditions);
+        let countQuery = db.select({ count: sql<number>`count(*)` }).from(Blogs);
 
+        if (whereConditions) {
+            countQuery = countQuery.where(whereConditions);
+        }
+
+        const totalCountResult = await countQuery;
         const totalCount = totalCountResult[0]?.count || 0;
 
         return { items, totalCount };

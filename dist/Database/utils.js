@@ -12,15 +12,27 @@ const buildSearchConditions = (table, options) => {
 };
 const buildWhereConditions = (table, options) => {
   const conditions = [];
-  const { search, searchFields, filters } = options;
-  if (search && searchFields && searchFields.length > 0) {
-    const searchCondition = buildSearchConditions(table, { search, searchFields });
-    if (searchCondition) {
-      conditions.push(searchCondition);
+  const { searchFieldsMapping, filters } = options;
+  if (searchFieldsMapping) {
+    const searchConditions = [];
+    Object.entries(searchFieldsMapping).forEach(([queryParam, tableColumn]) => {
+      const searchValue = filters?.[queryParam];
+      if (searchValue && typeof searchValue === "string") {
+        const column = table[tableColumn];
+        if (column) {
+          searchConditions.push(like(column, `%${searchValue}%`));
+        }
+      }
+    });
+    if (searchConditions.length > 0) {
+      conditions.push(or(...searchConditions));
     }
   }
   if (filters) {
     Object.entries(filters).forEach(([key, value]) => {
+      if (searchFieldsMapping && key in searchFieldsMapping) {
+        return;
+      }
       if (value !== void 0 && value !== null) {
         const column = table[key];
         if (column) {
@@ -31,9 +43,11 @@ const buildWhereConditions = (table, options) => {
   }
   return conditions.length > 0 ? and(...conditions) : void 0;
 };
-const buildPagination = (pageNumber, pageSize) => {
-  const skip = (pageNumber - 1) * pageSize;
-  return { limit: pageSize, offset: skip };
+const buildPagination = (pageNumber = 1, pageSize = 10) => {
+  const parsedPageNumber = Math.max(1, parseInt(String(pageNumber)) || 1);
+  const parsedPageSize = Math.max(1, Math.min(100, parseInt(String(pageSize)) || 10));
+  const skip = (parsedPageNumber - 1) * parsedPageSize;
+  return { limit: parsedPageSize, offset: skip };
 };
 const buildOrderBy = (table, sortBy = "id", sortDirection = "asc") => {
   const column = table[sortBy];
@@ -42,9 +56,16 @@ const buildOrderBy = (table, sortBy = "id", sortDirection = "asc") => {
   }
   return sortDirection === "desc" ? desc(column) : asc(column);
 };
+function createSearchMapping(searchFields) {
+  return Object.entries(searchFields).reduce((acc, [tableColumn, queryParam]) => {
+    acc[queryParam] = tableColumn;
+    return acc;
+  }, {});
+}
 export {
   buildOrderBy,
   buildPagination,
   buildSearchConditions,
-  buildWhereConditions
+  buildWhereConditions,
+  createSearchMapping
 };
