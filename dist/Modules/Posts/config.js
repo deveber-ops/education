@@ -37,7 +37,7 @@ var config_default = {
       method: "GET",
       name: "\u041F\u043E\u043B\u0443\u0447\u0435\u043D\u0438\u0435 \u043A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0435\u0432 \u043F\u043E\u0441\u0442\u0430",
       path: "/:postId/comments",
-      middlewares: [idValidation, paginationAndSortingValidation(CommentSortFields), validationMiddleware],
+      middlewares: [paginationAndSortingValidation(CommentSortFields), validationMiddleware],
       handler: getCommentsListHandler,
       authorization: false
     },

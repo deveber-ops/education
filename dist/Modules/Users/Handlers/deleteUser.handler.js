@@ -4,7 +4,7 @@ async function deleteUserHandler(req, res, next) {
   try {
     const id = parseInt(req.params.id, 10);
     await UsersService.delete(id);
-    res.sendStatus(HttpStatus.Ok);
+    res.sendStatus(HttpStatus.NoContent);
   } catch (error) {
     next(error);
   }

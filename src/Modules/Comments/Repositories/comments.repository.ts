@@ -58,16 +58,18 @@ export const CommentsRepository = {
     async findOne(id: number): Promise<CommentWithStringId> {
         const db = database.getDB();
 
-        const result = await db
+        const [comment] = await db
             .select()
             .from(Comments)
             .where(eq(Comments.id, id));
 
-        if (result.length === 0) {
+        if (!comment) {
             throw new repositoryNotFoundError('Комментарий не найден.', 'id');
         }
 
-        return toStringKeys(result[0], ['id']) as CommentWithStringId;
+        const {postId: _, ...rest} = comment
+
+        return toStringKeys(rest, ['id']) as CommentWithStringId;
     },
 
     async create(commentData: CommentInputType): Promise<CommentWithStringId> {

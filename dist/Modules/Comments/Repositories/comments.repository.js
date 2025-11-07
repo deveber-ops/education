@@ -32,11 +32,12 @@ const CommentsRepository = {
   },
   async findOne(id) {
     const db = database.getDB();
-    const result = await db.select().from(Comments).where(eq(Comments.id, id));
-    if (result.length === 0) {
+    const [comment] = await db.select().from(Comments).where(eq(Comments.id, id));
+    if (!comment) {
       throw new repositoryNotFoundError("\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439 \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D.", "id");
     }
-    return toStringKeys(result[0], ["id"]);
+    const { postId: _, ...rest } = comment;
+    return toStringKeys(rest, ["id"]);
   },
   async create(commentData) {
     const db = database.getDB();

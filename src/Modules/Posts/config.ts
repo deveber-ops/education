@@ -38,7 +38,7 @@ export default {
             method: 'GET',
             name: 'Получение комментариев поста',
             path: '/:postId/comments',
-            middlewares: [idValidation, paginationAndSortingValidation(CommentSortFields), validationMiddleware],
+            middlewares: [paginationAndSortingValidation(CommentSortFields), validationMiddleware],
             handler: getCommentsListHandler,
             authorization: false
         },

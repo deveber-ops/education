@@ -14,7 +14,7 @@ export async function deleteCommentHandler (req: Request, res: Response, next: N
         const userInfo:UserInfoType = await UsersService.findOne(userId);
 
         await CommentsService.delete(id, userInfo)
-        res.sendStatus(HttpStatus.Ok);
+        res.sendStatus(HttpStatus.NoContent);
     } catch (error: unknown) {
         next(error);
     }
