@@ -45,6 +45,8 @@ jobs:
             --exclude='*.d.ts.map' \
             --exclude='*.map' \
             --exclude='node_modules' \
+            --exclude='.htaccess' \
+            --exclude='.env' \
               /home/${{ secrets.HOSTER_SSH_USER }}/__temp_dist/ \
               ${{ secrets.HOSTER_SSH_PATH }}/
 
