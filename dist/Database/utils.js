@@ -49,15 +49,15 @@ const buildPagination = (pageNumber = 1, pageSize = 10) => {
   const skip = (parsedPageNumber - 1) * parsedPageSize;
   return { limit: parsedPageSize, offset: skip };
 };
-const buildOrderBy = (table, sortBy, sortDirection) => {
+const buildOrderBy = (table, sortBy, sortDirection = "asc") => {
   const column = table[sortBy];
   if (!column) {
     throw new Error(`Column ${sortBy} not found in table`);
   }
   const stringColumnTypes = ["MySqlVarChar", "MySqlText", "MySqlChar"];
   if (stringColumnTypes.includes(column.columnType)) {
-    const caseInsensitiveColumn = sql`${column} COLLATE utf8mb4_unicode_ci`;
-    return sortDirection === "desc" ? desc(caseInsensitiveColumn) : asc(caseInsensitiveColumn);
+    const lowerColumn = sql`LOWER(${column})`;
+    return sortDirection === "desc" ? desc(lowerColumn) : asc(lowerColumn);
   }
   return sortDirection === "desc" ? desc(column) : asc(column);
 };

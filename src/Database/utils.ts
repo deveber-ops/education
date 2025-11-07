@@ -93,7 +93,7 @@ export const buildPagination = (pageNumber: any = 1, pageSize: any = 10) => {
 export const buildOrderBy = (
     table: AnyMySqlTable,
     sortBy: string,
-    sortDirection: 'asc' | 'desc',
+    sortDirection: 'asc' | 'desc' = 'asc'
 ) => {
     const column = table[sortBy as keyof typeof table] as MySqlColumn | undefined;
 
@@ -101,16 +101,14 @@ export const buildOrderBy = (
         throw new Error(`Column ${sortBy} not found in table`);
     }
 
-    // Определяем строковые типы данных
     const stringColumnTypes = ['MySqlVarChar', 'MySqlText', 'MySqlChar'];
 
-    // Если колонка строкового типа - делаем case-insensitive
+    // Если колонка строкового типа - используем LOWER() для case-insensitive
     if (stringColumnTypes.includes(column.columnType)) {
-        const caseInsensitiveColumn = sql`${column} COLLATE utf8mb4_unicode_ci`;
-        return sortDirection === 'desc' ? desc(caseInsensitiveColumn) : asc(caseInsensitiveColumn);
+        const lowerColumn = sql`LOWER(${column})`;
+        return sortDirection === 'desc' ? desc(lowerColumn) : asc(lowerColumn);
     }
 
-    // Для остальных колонок обычная сортировка
     return sortDirection === 'desc' ? desc(column) : asc(column);
 };
 
