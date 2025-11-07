@@ -5,8 +5,8 @@ import {mapToBlogListPaginatedOutput} from "../Mappers/blogsListPaginated.mapper
 import {BlogsService} from "../Services/blogs.services";
 
 export async function getBlogsListHandler (req: Request, res: Response, next: NextFunction) {
+    console.log('GET /api/blogs query:', req.query);
     try {
-
         const queryInput = setSortAndPagination(req.query)
 
         const { items, totalCount } = await BlogsService.findMany(<BlogQueryInput>queryInput)
