@@ -1,7 +1,24 @@
-import { and, like, or, eq, desc, asc, sql } from "drizzle-orm";
+import { and, like, or, eq, sql } from "drizzle-orm";
+const buildSearchConditions = (table, options) => {
+  const { search, searchFields } = options;
+  if (!search || !searchFields || searchFields.length === 0) {
+    return void 0;
+  }
+  const conditions = searchFields.map((field) => {
+    const column = table[field];
+    return column ? like(column, `%${search}%`) : void 0;
+  }).filter((condition) => condition !== void 0);
+  return conditions.length > 0 ? or(...conditions) : void 0;
+};
 const buildWhereConditions = (table, options) => {
   const conditions = [];
-  const { searchFieldsMapping, filters } = options;
+  const { searchFieldsMapping, filters, search, searchFields } = options;
+  if (search && searchFields && searchFields.length > 0) {
+    const searchConditions = buildSearchConditions(table, { search, searchFields });
+    if (searchConditions) {
+      conditions.push(searchConditions);
+    }
+  }
   if (searchFieldsMapping && filters) {
     const searchConditions = [];
     Object.entries(searchFieldsMapping).forEach(([queryParam, tableColumn]) => {
@@ -22,7 +39,10 @@ const buildWhereConditions = (table, options) => {
       if (searchFieldsMapping && key in searchFieldsMapping) {
         return;
       }
-      if (value !== void 0 && value !== null) {
+      if (["page", "pageSize", "sortBy", "sortDirection"].includes(key)) {
+        return;
+      }
+      if (value !== void 0 && value !== null && value !== "") {
         const column = table[key];
         if (column) {
           conditions.push(eq(column, value));
@@ -38,19 +58,16 @@ const buildPagination = (pageNumber = 1, pageSize = 10) => {
   const skip = (parsedPageNumber - 1) * parsedPageSize;
   return { limit: parsedPageSize, offset: skip };
 };
-const buildOrderBy = (table, sortBy, sortDirection = "asc", fallbackSortBy = "id") => {
+const buildOrderBy = (table, sortBy, sortDirection = "asc") => {
   const column = table[sortBy];
-  const fallbackColumn = table[fallbackSortBy];
   if (!column) {
     throw new Error(`Column "${sortBy}" not found in table`);
   }
-  if (!fallbackColumn) {
-    throw new Error(`Fallback column "${fallbackSortBy}" not found in table`);
-  }
   const isStringColumn = ["MySqlVarChar", "MySqlText", "MySqlChar"].includes(column.columnType);
-  const direction = sortDirection.toUpperCase();
-  const primaryOrder = isStringColumn ? sql`${column} COLLATE utf8mb4_unicode_ci ${sql.raw(direction)}` : sortDirection === "desc" ? desc(column) : asc(column);
-  return [primaryOrder, asc(fallbackColumn)];
+  if (isStringColumn) {
+    return sortDirection === "desc" ? sql`LOWER(${column}) DESC` : sql`LOWER(${column}) ASC`;
+  }
+  return sortDirection === "desc" ? sql`${column} DESC` : sql`${column} ASC`;
 };
 function createSearchMapping(searchFields) {
   return Object.entries(searchFields).reduce((acc, [tableColumn, queryParam]) => {
@@ -61,6 +78,7 @@ function createSearchMapping(searchFields) {
 export {
   buildOrderBy,
   buildPagination,
+  buildSearchConditions,
   buildWhereConditions,
   createSearchMapping
 };

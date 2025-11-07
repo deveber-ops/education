@@ -24,8 +24,6 @@ export const UsersRepository = {
             ...searchFilters
         } = queryDto;
 
-        console.log(sortDirection)
-
         const searchFieldsMapping = createSearchMapping(UserSearchFields);
 
         const db = database.getDB();
@@ -38,6 +36,8 @@ export const UsersRepository = {
             filters: searchFilters,
         });
 
+        console.log(whereConditions)
+
         let query = db.select().from(Users);
 
         if (whereConditions) {
@@ -45,7 +45,7 @@ export const UsersRepository = {
         }
 
         const items = await query
-            .orderBy(...orderBy)
+            .orderBy(orderBy)
             .limit(pagination.limit)
             .offset(pagination.offset);
 

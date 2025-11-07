@@ -17,7 +17,6 @@ const UsersRepository = {
       sortDirection,
       ...searchFilters
     } = queryDto;
-    console.log(sortDirection);
     const searchFieldsMapping = createSearchMapping(UserSearchFields);
     const db = database.getDB();
     const pagination = buildPagination(pageNumber, pageSize);
@@ -26,11 +25,12 @@ const UsersRepository = {
       searchFieldsMapping,
       filters: searchFilters
     });
+    console.log(whereConditions);
     let query = db.select().from(Users);
     if (whereConditions) {
       query = query.where(whereConditions);
     }
-    const items = await query.orderBy(...orderBy).limit(pagination.limit).offset(pagination.offset);
+    const items = await query.orderBy(orderBy).limit(pagination.limit).offset(pagination.offset);
     let countQuery = db.select({ count: sql`count(*)` }).from(Users);
     if (whereConditions) {
       countQuery = countQuery.where(whereConditions);
