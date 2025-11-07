@@ -31,7 +31,7 @@ const buildWhereConditions = (table, options) => {
   }
   return conditions.length > 0 ? and(...conditions) : void 0;
 };
-const buildPagination = (pageNumber = 1, pageSize = 10) => {
+const buildPagination = (pageNumber, pageSize) => {
   const skip = (pageNumber - 1) * pageSize;
   return { limit: pageSize, offset: skip };
 };
