@@ -16,7 +16,7 @@ const BlogsRepository = {
     } = queryDto;
     const db = database.getDB();
     const pagination = buildPagination(pageNumber, pageSize);
-    const orderBy = buildOrderBy(Blogs, sortBy, sortDirection);
+    const orderBy = buildOrderBy(Blogs, sortBy ?? "createdAt", sortDirection);
     const searchFieldsMapping = createSearchMapping(BlogSearchFields);
     const whereConditions = buildWhereConditions(Blogs, {
       searchFieldsMapping,
@@ -26,7 +26,7 @@ const BlogsRepository = {
     if (whereConditions) {
       query = query.where(whereConditions);
     }
-    const items = await query.orderBy(orderBy).limit(pagination.limit).offset(pagination.offset);
+    const items = await query.orderBy(...orderBy).limit(pagination.limit).offset(pagination.offset);
     let countQuery = db.select({ count: sql`count(*)` }).from(Blogs);
     if (whereConditions) {
       countQuery = countQuery.where(whereConditions);

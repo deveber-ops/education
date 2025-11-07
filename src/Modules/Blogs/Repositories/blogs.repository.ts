@@ -19,7 +19,7 @@ export const BlogsRepository = {
         const db = database.getDB();
 
         const pagination = buildPagination(pageNumber, pageSize);
-        const orderBy = buildOrderBy(Blogs, sortBy, sortDirection);
+        const orderBy = buildOrderBy(Blogs, sortBy ?? 'createdAt', sortDirection);
 
         const searchFieldsMapping = createSearchMapping(BlogSearchFields);
 
@@ -35,7 +35,7 @@ export const BlogsRepository = {
         }
 
         const items = await query
-            .orderBy(orderBy)
+            .orderBy(...orderBy)
             .limit(pagination.limit)
             .offset(pagination.offset);
 
