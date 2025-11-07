@@ -1,5 +1,6 @@
 .htaccess
 .env.production
 .env
+/dist/.env
 pnpm-lock.yaml
 /node_modules/**/**
