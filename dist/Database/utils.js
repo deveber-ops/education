@@ -1,4 +1,4 @@
-import { and, like, or, eq, asc, sql } from "drizzle-orm";
+import { and, like, or, eq, desc, asc } from "drizzle-orm";
 const buildSearchConditions = (table, options) => {
   const { search, searchFields } = options;
   if (!search || !searchFields || searchFields.length === 0) {
@@ -49,20 +49,12 @@ const buildPagination = (pageNumber = 1, pageSize = 10) => {
   const skip = (parsedPageNumber - 1) * parsedPageSize;
   return { limit: parsedPageSize, offset: skip };
 };
-const buildOrderBy = (table, sortBy, sortDirection = "asc", fallbackSortBy = "id") => {
+const buildOrderBy = (table, sortBy, sortDirection = "asc") => {
   const column = table[sortBy];
-  const fallbackColumn = table[fallbackSortBy];
   if (!column) {
     throw new Error(`Column "${sortBy}" not found in table`);
   }
-  if (!fallbackColumn) {
-    throw new Error(`Fallback column "${fallbackSortBy}" not found in table`);
-  }
-  const direction = sortDirection.toUpperCase();
-  return [
-    sql`${column} COLLATE utf8mb4_unicode_ci ${sql.raw(direction)}`,
-    asc(fallbackColumn)
-  ];
+  return sortDirection === "desc" ? desc(column) : asc(column);
 };
 function createSearchMapping(searchFields) {
   return Object.entries(searchFields).reduce((acc, [tableColumn, queryParam]) => {

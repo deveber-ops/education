@@ -1,4 +1,4 @@
-import {SQL, and, like, or, eq, asc, sql} from "drizzle-orm";
+import {SQL, and, like, or, eq, desc, asc} from "drizzle-orm";
 import { AnyMySqlTable, MySqlColumn } from "drizzle-orm/mysql-core";
 
 export interface SearchOptions {
@@ -96,26 +96,15 @@ export const buildPagination = (pageNumber: any = 1, pageSize: any = 10) => {
 export const buildOrderBy = (
     table: AnyMySqlTable,
     sortBy: string,
-    sortDirection: 'asc' | 'desc' = 'asc',
-    fallbackSortBy: string = 'id'
+    sortDirection: 'asc' | 'desc' = 'asc'
 ) => {
     const column = table[sortBy as keyof typeof table] as MySqlColumn | undefined;
-    const fallbackColumn = table[fallbackSortBy as keyof typeof table] as MySqlColumn | undefined;
 
     if (!column) {
         throw new Error(`Column "${sortBy}" not found in table`);
     }
 
-    if (!fallbackColumn) {
-        throw new Error(`Fallback column "${fallbackSortBy}" not found in table`);
-    }
-
-    const direction = sortDirection.toUpperCase();
-
-    return [
-        sql`${column} COLLATE utf8mb4_unicode_ci ${sql.raw(direction)}`,
-        asc(fallbackColumn),
-    ];
+    return sortDirection === 'desc' ? desc(column) : asc(column);
 };
 
 export function createSearchMapping<T extends Record<string, string>>(searchFields: T): Record<string, string> {
