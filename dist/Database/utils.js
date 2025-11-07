@@ -26,7 +26,8 @@ const buildWhereConditions = (table, options) => {
       if (searchValue && typeof searchValue === "string") {
         const column = table[tableColumn];
         if (column) {
-          searchConditions.push(like(column, `%${searchValue}%`));
+          const condition = like(column, `%${searchValue}%`);
+          searchConditions.push(condition);
         }
       }
     });
@@ -39,7 +40,7 @@ const buildWhereConditions = (table, options) => {
       if (searchFieldsMapping && key in searchFieldsMapping) {
         return;
       }
-      if (["page", "pageSize", "sortBy", "sortDirection"].includes(key)) {
+      if (["pageNumber", "pageSize", "sortBy", "sortDirection"].includes(key)) {
         return;
       }
       if (value !== void 0 && value !== null && value !== "") {
@@ -65,7 +66,8 @@ const buildOrderBy = (table, sortBy, sortDirection = "asc") => {
   }
   const isStringColumn = ["MySqlVarChar", "MySqlText", "MySqlChar"].includes(column.columnType);
   if (isStringColumn) {
-    return sortDirection === "desc" ? sql`LOWER(${column}) DESC` : sql`LOWER(${column}) ASC`;
+    const direction = sortDirection.toUpperCase();
+    return sql`${column} COLLATE utf8mb4_bin ${sql.raw(direction)}`;
   }
   return sortDirection === "desc" ? sql`${column} DESC` : sql`${column} ASC`;
 };

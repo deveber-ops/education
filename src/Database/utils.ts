@@ -58,17 +58,19 @@ export const buildWhereConditions = (
             if (searchValue && typeof searchValue === 'string') {
                 const column = table[tableColumn as keyof typeof table] as MySqlColumn | undefined;
                 if (column) {
-                    searchConditions.push(like(column, `%${searchValue}%`));
+                    const condition = like(column, `%${searchValue}%`);
+                    searchConditions.push(condition);
                 }
             }
         });
 
+        // ВАЖНО: Добавляем проверку на пустой массив
         if (searchConditions.length > 0) {
-            conditions.push(<SQL<unknown>>or(...searchConditions));
+            conditions.push(or(...searchConditions) as SQL);
         }
     }
 
-    // Обычные фильтры (не search)
+    // Обычные фильтры (не search) - они объединяются через AND
     if (filters) {
         Object.entries(filters).forEach(([key, value]) => {
             // Пропускаем поля, которые уже обработаны в searchFieldsMapping
@@ -76,8 +78,8 @@ export const buildWhereConditions = (
                 return;
             }
 
-            // Пропускаем специальные поля для пагинации и сортировки
-            if (['page', 'pageSize', 'sortBy', 'sortDirection'].includes(key)) {
+            // Пропускаем служебные параметры пагинации и сортировки
+            if (['pageNumber', 'pageSize', 'sortBy', 'sortDirection'].includes(key)) {
                 return;
             }
 
@@ -116,10 +118,9 @@ export const buildOrderBy = (
     const isStringColumn = ['MySqlVarChar', 'MySqlText', 'MySqlChar'].includes(column.columnType);
 
     if (isStringColumn) {
-        // Используем LOWER для гарантированной нерегистрозависимой сортировки
-        return sortDirection === 'desc'
-            ? sql`LOWER(${column}) DESC`
-            : sql`LOWER(${column}) ASC`;
+        const direction = sortDirection.toUpperCase();
+        // Используем binary collation для регистрозависимой сортировки
+        return sql`${column} COLLATE utf8mb4_bin ${sql.raw(direction)}`;
     }
 
     return sortDirection === 'desc' ? sql`${column} DESC` : sql`${column} ASC`;

@@ -35,7 +35,7 @@ export const BlogsRepository = {
         }
 
         const items = await query
-            .orderBy(...orderBy)
+            .orderBy(orderBy)
             .limit(pagination.limit)
             .offset(pagination.offset);
 
