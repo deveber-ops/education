@@ -16,10 +16,12 @@ export default {
             handler: async (req: Request, res: Response, next: NextFunction) => {
                 const db = database.getDB();
                 try {
+                    await db.execute(sql`SET FOREIGN_KEY_CHECKS = 0`);
                     await db.execute(sql`TRUNCATE TABLE Comments`);
                     await db.execute(sql`TRUNCATE TABLE Posts`);
                     await db.execute(sql`TRUNCATE TABLE Blogs`);
                     await db.execute(sql`TRUNCATE TABLE Users`);
+                    await db.execute(sql`SET FOREIGN_KEY_CHECKS = 1`);
                     res.sendStatus(HttpStatus.NoContent);
                 } catch (error) {
                     next(error);
