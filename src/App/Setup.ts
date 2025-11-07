@@ -1,4 +1,4 @@
-import express, { Express } from 'express';
+import express, { Express, Request, Response, NextFunction } from 'express';
 import cookieParser from 'cookie-parser';
 import {detectClientTypeMiddleware} from "../Core/Middlewares/detectClientType.middleware";
 import {loadRoutes} from "./Router";
@@ -9,6 +9,19 @@ dotenv.config();
 
 export const setupApp = async (app: Express) => {
     await database.connect();
+
+    app.use((req: Request, _res: Response, next: NextFunction) => {
+        if (!req.headers.host || req.headers.host === '') {
+            req.headers.host = 'edu.deveber.site';
+        }
+
+        // Также устанавливаем другие необходимые заголовки
+        if (!req.headers['x-forwarded-host']) {
+            req.headers['x-forwarded-host'] = req.headers.host;
+        }
+
+        next();
+    });
 
     const { router } = await loadRoutes();
 
