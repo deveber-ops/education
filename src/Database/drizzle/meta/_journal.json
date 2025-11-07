@@ -71,6 +71,13 @@
       "when": 1762520271064,
       "tag": "0009_secret_hardball",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1762522575910,
+      "tag": "0010_clear_banshee",
+      "breakpoints": true
     }
   ]
 }
