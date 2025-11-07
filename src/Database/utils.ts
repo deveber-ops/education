@@ -92,7 +92,7 @@ export const buildPagination = (pageNumber: any = 1, pageSize: any = 10) => {
     return { limit: parsedPageSize, offset: skip };
 };
 
-// utils.ts
+// Утилита для сортировки
 export const buildOrderBy = (
     table: AnyMySqlTable,
     sortBy: string,
@@ -101,14 +101,14 @@ export const buildOrderBy = (
     const column = table[sortBy as keyof typeof table] as MySqlColumn | undefined;
 
     if (!column) {
-        throw new Error(`Column "${sortBy}" not found in table`);
+        throw new Error(`Column ${sortBy} not found in table`);
     }
 
-    const isStringColumn = ['MySqlVarChar', 'MySqlText', 'MySqlChar'].includes(column.columnType);
-    const direction = sortDirection.toUpperCase();
+    const stringColumnTypes = ['MySqlVarChar', 'MySqlText', 'MySqlChar'];
 
-    if (isStringColumn) {
-        return sql.raw(`\`${column.name}\` COLLATE utf8mb4_unicode_ci ${direction}`);
+    if (stringColumnTypes.includes(column.columnType)) {
+        const lowerColumn = sql`LOWER(${column})`;
+        return sortDirection === 'desc' ? desc(lowerColumn) : asc(lowerColumn);
     }
 
     return sortDirection === 'desc' ? desc(column) : asc(column);
