@@ -13,10 +13,10 @@ const buildSearchConditions = (table, options) => {
 const buildWhereConditions = (table, options) => {
   const conditions = [];
   const { searchFieldsMapping, filters } = options;
-  if (searchFieldsMapping) {
+  if (searchFieldsMapping && filters) {
     const searchConditions = [];
     Object.entries(searchFieldsMapping).forEach(([queryParam, tableColumn]) => {
-      const searchValue = filters?.[queryParam];
+      const searchValue = filters[queryParam];
       if (searchValue && typeof searchValue === "string") {
         const column = table[tableColumn];
         if (column) {

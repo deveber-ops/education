@@ -44,25 +44,28 @@ export const buildWhereConditions = (
     const conditions: SQL[] = [];
     const { searchFieldsMapping, filters } = options;
 
-    if (searchFieldsMapping) {
+    if (searchFieldsMapping && filters) {
         const searchConditions: SQL[] = [];
 
         Object.entries(searchFieldsMapping).forEach(([queryParam, tableColumn]) => {
-            const searchValue = filters?.[queryParam];
+            const searchValue = filters[queryParam];
 
             if (searchValue && typeof searchValue === 'string') {
                 const column = table[tableColumn as keyof typeof table] as MySqlColumn | undefined;
                 if (column) {
+                    // Для каждого search поля создаем условие LIKE
                     searchConditions.push(like(column, `%${searchValue}%`));
                 }
             }
         });
 
+        // Объединяем условия поиска через OR (а не AND)
         if (searchConditions.length > 0) {
-            conditions.push(<SQL<unknown>>or(...searchConditions));
+            conditions.push(<SQL<unknown>>or(...searchConditions)); // ← ИЗМЕНИТЬ НА OR
         }
     }
 
+    // Обычные фильтры (не search) остаются как AND
     if (filters) {
         Object.entries(filters).forEach(([key, value]) => {
             if (searchFieldsMapping && key in searchFieldsMapping) {
@@ -90,6 +93,7 @@ export const buildPagination = (pageNumber: any = 1, pageSize: any = 10) => {
 };
 
 // Утилита для сортировки
+// utils.ts
 export const buildOrderBy = (
     table: AnyMySqlTable,
     sortBy: string,
@@ -103,7 +107,6 @@ export const buildOrderBy = (
 
     const stringColumnTypes = ['MySqlVarChar', 'MySqlText', 'MySqlChar'];
 
-    // Если колонка строкового типа - используем LOWER() для case-insensitive
     if (stringColumnTypes.includes(column.columnType)) {
         const lowerColumn = sql`LOWER(${column})`;
         return sortDirection === 'desc' ? desc(lowerColumn) : asc(lowerColumn);
