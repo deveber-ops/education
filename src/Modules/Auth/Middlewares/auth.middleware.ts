@@ -8,11 +8,6 @@ const ACCESS_TOKEN_SECRET = process.env.JWT_SECRET!;
 export const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
 export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
-export interface AuthenticatedRequest extends Request {
-    userId?: number;
-}
-
-
 export async function authMiddleware(req: Request, res: Response, next: NextFunction) {
     try {
         const authHeader = req.headers.authorization;
@@ -22,7 +17,12 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
 
         // 1. Проверка типа авторизации
         if (authHeader) {
-            const [authType, token] = authHeader.split(' ');
+            const parts = authHeader.split(' ');
+            if (parts.length !== 2) {
+                return next(new authError('Неверный формат авторизации.', 'header'));
+            }
+
+            const [authType, token] = parts;
 
             if (authType === 'Bearer') {
                 accessToken = token || cookieToken;
@@ -30,10 +30,8 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
                 accessToken = token;
                 isBasic = true;
             } else {
-                return next(new authError('Неподдерживаемый тип авторизации.', 'token'));
+                return next(new authError('Неподдерживаемый тип авторизации.', 'header'));
             }
-        } else if (cookieToken) {
-            accessToken = cookieToken;
         }
 
         if (!accessToken) {
