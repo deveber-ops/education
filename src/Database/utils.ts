@@ -1,4 +1,4 @@
-import {SQL, and, like, or, eq, desc, asc} from "drizzle-orm";
+import {SQL, and, like, or, eq, desc, asc, sql} from "drizzle-orm";
 import { AnyMySqlTable, MySqlColumn } from "drizzle-orm/mysql-core";
 
 export interface SearchOptions {
@@ -11,26 +11,6 @@ export interface WhereBuilderOptions {
     searchFields?: string[];
     filters?: Record<string, any>;
 }
-
-export const buildSearchConditions = (
-    table: AnyMySqlTable,
-    options: SearchOptions
-): SQL | undefined => {
-    const { search, searchFields } = options;
-
-    if (!search || !searchFields || searchFields.length === 0) {
-        return undefined;
-    }
-
-    const conditions = searchFields
-        .map(field => {
-            const column = table[field as keyof typeof table] as MySqlColumn | undefined;
-            return column ? like(column, `%${search}%`) : undefined;
-        })
-        .filter((condition): condition is SQL => condition !== undefined);
-
-    return conditions.length > 0 ? or(...conditions) : undefined;
-};
 
 export interface WhereBuilderOptions {
     searchFieldsMapping?: Record<string, string>;
@@ -96,15 +76,30 @@ export const buildPagination = (pageNumber: any = 1, pageSize: any = 10) => {
 export const buildOrderBy = (
     table: AnyMySqlTable,
     sortBy: string,
-    sortDirection: 'asc' | 'desc' = 'asc'
-) => {
+    sortDirection: 'asc' | 'desc' = 'asc',
+    fallbackSortBy: string = 'id'
+): (ReturnType<typeof sql> | ReturnType<typeof asc> | ReturnType<typeof desc>)[] => {
     const column = table[sortBy as keyof typeof table] as MySqlColumn | undefined;
+    const fallbackColumn = table[fallbackSortBy as keyof typeof table] as MySqlColumn | undefined;
 
     if (!column) {
         throw new Error(`Column "${sortBy}" not found in table`);
     }
 
-    return sortDirection === 'desc' ? desc(column) : asc(column);
+    if (!fallbackColumn) {
+        throw new Error(`Fallback column "${fallbackSortBy}" not found in table`);
+    }
+
+    const isStringColumn = ['MySqlVarChar', 'MySqlText', 'MySqlChar'].includes(column.columnType);
+    const direction = sortDirection.toUpperCase();
+
+    const primaryOrder = isStringColumn
+        ? sql`${column} COLLATE utf8mb4_unicode_ci ${sql.raw(direction)}`
+        : sortDirection === 'desc'
+            ? desc(column)
+            : asc(column);
+
+    return [primaryOrder, asc(fallbackColumn)];
 };
 
 export function createSearchMapping<T extends Record<string, string>>(searchFields: T): Record<string, string> {

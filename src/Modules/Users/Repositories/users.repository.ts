@@ -31,7 +31,7 @@ export const UsersRepository = {
         const db = database.getDB();
 
         const pagination = buildPagination(pageNumber, pageSize);
-        const orderBy = buildOrderBy(Users, sortBy, sortDirection);
+        const orderBy = buildOrderBy(Users, sortBy ?? 'createdAt', sortDirection);
 
         const whereConditions = buildWhereConditions(Users, {
             searchFieldsMapping,
@@ -45,7 +45,7 @@ export const UsersRepository = {
         }
 
         const items = await query
-            .orderBy(orderBy)
+            .orderBy(...orderBy)
             .limit(pagination.limit)
             .offset(pagination.offset);
 
