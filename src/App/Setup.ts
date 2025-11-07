@@ -10,6 +10,8 @@ dotenv.config();
 export const setupApp = async (app: Express) => {
     await database.connect();
 
+    const { router } = await loadRoutes();
+
     app.use((req: Request, res: Response, next: NextFunction) => {
         if (!req.headers['content-type'] &&
             ['POST', 'PUT', 'PATCH'].includes(req.method) &&
@@ -18,8 +20,6 @@ export const setupApp = async (app: Express) => {
         }
         next();
     });
-
-    const { router } = await loadRoutes();
 
     app.use(express.json({ limit: '10mb', strict: false }));
     app.use(express.urlencoded({ extended: true, limit: '10mb', type: '*/*' }));

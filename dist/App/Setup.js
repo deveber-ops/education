@@ -8,13 +8,13 @@ import * as dotenv from "dotenv";
 dotenv.config();
 const setupApp = async (app) => {
   await database.connect();
+  const { router } = await loadRoutes();
   app.use((req, res, next) => {
     if (!req.headers["content-type"] && ["POST", "PUT", "PATCH"].includes(req.method) && req.body !== void 0) {
       req.headers["content-type"] = "application/json";
     }
     next();
   });
-  const { router } = await loadRoutes();
   app.use(express.json({ limit: "10mb", strict: false }));
   app.use(express.urlencoded({ extended: true, limit: "10mb", type: "*/*" }));
   app.use(cookieParser());
