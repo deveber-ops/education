@@ -63,7 +63,7 @@ export const buildWhereConditions = (
 };
 
 // Утилита для пагинации
-export const buildPagination = (pageNumber: number = 1, pageSize: number = 10) => {
+export const buildPagination = (pageNumber: number, pageSize: number) => {
     const skip = (pageNumber - 1) * pageSize;
     return { limit: pageSize, offset: skip };
 };
