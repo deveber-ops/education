@@ -5,6 +5,7 @@ import { buildOrderBy, buildPagination } from '../../../Database/utils.js';
 import { Comments } from '../../../Database/schema.js';
 import { eq, sql } from "drizzle-orm";
 import { forbiddenError } from '../../../Core/Errors/forbidden.errors.js';
+import { toStringKeys } from '../../../Core/Helpers/idToString.helper.js';
 const CommentsRepository = {
   async findMany(queryDto, postId) {
     const {
@@ -35,7 +36,7 @@ const CommentsRepository = {
     if (result.length === 0) {
       throw new repositoryNotFoundError("\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439 \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D.", "id");
     }
-    return result[0];
+    return toStringKeys(result[0], ["id"]);
   },
   async create(commentData) {
     const db = database.getDB();
@@ -45,7 +46,7 @@ const CommentsRepository = {
       const [createdComment] = await db.insert(Comments).values(commentData);
       const createdCommentId = createdComment?.insertId;
       const [comment] = await db.select().from(Comments).where(eq(Comments.id, createdCommentId)).limit(1);
-      return comment;
+      return toStringKeys(comment, ["id"]);
     } catch (error) {
       throw error;
     }
@@ -55,7 +56,7 @@ const CommentsRepository = {
     const existingComment = await this.findOne(id);
     if (!existingComment)
       throw new repositoryNotFoundError("\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439 \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D.", "id");
-    if (existingComment.commentatorInfo.userId !== commentData.commentatorInfo.userId)
+    if (existingComment.commentatorInfo.userId !== commentData.commentatorInfo.userId.toString())
       throw new forbiddenError("\u0412\u044B \u043D\u0435 \u043C\u043E\u0436\u0435\u0442\u0435 \u0440\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u0447\u0443\u0436\u0438\u0435 \u043A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0438.", "comment");
     try {
       await db.update(Comments).set(commentData).where(eq(Comments.id, id));
@@ -68,7 +69,7 @@ const CommentsRepository = {
     const existingComment = await this.findOne(id);
     if (!existingComment)
       throw new repositoryNotFoundError("\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439 \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D.", "id");
-    if (existingComment.commentatorInfo.userId !== userInfo.id)
+    if (existingComment.commentatorInfo.userId !== userInfo.id.toString())
       throw new forbiddenError("\u0412\u044B \u043D\u0435 \u043C\u043E\u0436\u0435\u0442\u0435 \u0443\u0434\u0430\u043B\u044F\u0442\u044C \u0447\u0443\u0436\u0438\u0435 \u043A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0438.", "comment");
     await db.delete(Comments).where(eq(Comments.id, id));
   }

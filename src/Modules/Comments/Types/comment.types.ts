@@ -1,14 +1,19 @@
 import {InferInsertModel, InferSelectModel} from "drizzle-orm";
 import {Comments} from "../../../Database/schema";
 import {SortDirection} from "../../../Core/Types/sortDirections.type";
-import {Blog} from "../../Blogs/Types/blog.types";
 
 export enum CommentSortFields {
     CreatedAt = "createdAt",
 }
 
 export type Comment = InferSelectModel<typeof Comments>;
-export type CommentWithStringId = Omit<Comment, 'id' | 'postId'> & { id: string };
+export type CommentWithStringId = Omit<Comment, 'id' | 'postId' | 'commentatorInfo'> & {
+    id: string;
+    commentatorInfo: {
+        userId: string;
+        userLogin: string;
+    };
+};
 export type CommentInputType = InferInsertModel<typeof Comments>;
 
 export type CommentQueryInput = {

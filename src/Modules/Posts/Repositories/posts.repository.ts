@@ -1,10 +1,11 @@
-import {Post, PostInputType, PostQueryInput} from "../Types/post.types";
+import {Post, PostInputType, PostQueryInput, PostWithStringId} from "../Types/post.types";
 import {Posts} from "../../../Database/schema";
 import {eq, sql} from "drizzle-orm";
 import database from "../../../Database/database";
 import {buildOrderBy, buildPagination} from "../../../Database/utils";
 import {repositoryNotFoundError, repositoryUniqueError} from "../../../Core/Errors/repository.errors";
 import {BlogsRepository} from "../../Blogs/Repositories/blogs.repository";
+import {toStringKeys} from "../../../Core/Helpers/idToString.helper";
 
 export const PostsRepository = {
     async findMany(
@@ -57,7 +58,7 @@ export const PostsRepository = {
         return { items, totalCount };
     },
 
-    async findOne(id: number): Promise<Post> {
+    async findOne(id: number): Promise<PostWithStringId> {
         const db = database.getDB();
 
         const result = await db
@@ -69,10 +70,10 @@ export const PostsRepository = {
             throw new repositoryNotFoundError('Пост не найден.', 'id');
         }
 
-        return result[0]
+        return toStringKeys(result[0], ['id']) as PostWithStringId;
     },
 
-    async create(postData: PostInputType, blogId?: number | null | undefined): Promise<Post> {
+    async create(postData: PostInputType, blogId?: number | null | undefined): Promise<PostWithStringId> {
         const db = database.getDB()
 
         if (blogId) {
@@ -106,7 +107,7 @@ export const PostsRepository = {
                 .where(eq(Posts.id, createdPostId))
                 .limit(1)
 
-            return post;
+            return toStringKeys(post, ['id', 'blogId']) as PostWithStringId;
         } catch (error: any) {
             throw error;
         }

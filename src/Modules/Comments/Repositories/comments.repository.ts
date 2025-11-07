@@ -1,4 +1,4 @@
-import {Comment, CommentInputType, CommentQueryInput} from "../Types/comment.types";
+import {Comment, CommentInputType, CommentQueryInput, CommentWithStringId} from "../Types/comment.types";
 import {PostsRepository} from "../../Posts/Repositories/posts.repository";
 import {repositoryNotFoundError} from "../../../Core/Errors/repository.errors";
 import database from "../../../Database/database";
@@ -7,6 +7,7 @@ import {Comments} from "../../../Database/schema";
 import {eq, sql} from "drizzle-orm";
 import {UserInfoType} from "../../Users/Types/user.types";
 import {forbiddenError} from "../../../Core/Errors/forbidden.errors";
+import {toStringKeys} from "../../../Core/Helpers/idToString.helper";
 
 export const CommentsRepository = {
     async findMany(
@@ -54,7 +55,7 @@ export const CommentsRepository = {
         return { items, totalCount };
     },
 
-    async findOne(id: number): Promise<Comment> {
+    async findOne(id: number): Promise<CommentWithStringId> {
         const db = database.getDB();
 
         const result = await db
@@ -66,10 +67,10 @@ export const CommentsRepository = {
             throw new repositoryNotFoundError('Комментарий не найден.', 'id');
         }
 
-        return result[0]
+        return toStringKeys(result[0], ['id']) as CommentWithStringId;
     },
 
-    async create(commentData: CommentInputType): Promise<Comment> {
+    async create(commentData: CommentInputType): Promise<CommentWithStringId> {
         const db = database.getDB()
 
         const existingPost = await PostsRepository.findOne(commentData.postId);
@@ -89,7 +90,7 @@ export const CommentsRepository = {
                 .where(eq(Comments.id, createdCommentId))
                 .limit(1)
 
-            return comment;
+            return toStringKeys(comment, ['id']) as CommentWithStringId;
         } catch (error: any) {
             throw error;
         }
@@ -103,7 +104,7 @@ export const CommentsRepository = {
         if (!existingComment)
             throw new repositoryNotFoundError('Комментарий не найден.', 'id')
 
-        if (existingComment.commentatorInfo.userId !== commentData.commentatorInfo.userId)
+        if (existingComment.commentatorInfo.userId !== commentData.commentatorInfo.userId.toString())
             throw new forbiddenError('Вы не можете редактировать чужие комментарии.', 'comment')
 
         try {
@@ -124,7 +125,7 @@ export const CommentsRepository = {
         if (!existingComment)
             throw new repositoryNotFoundError('Комментарий не найден.', 'id')
 
-        if (existingComment.commentatorInfo.userId !== userInfo.id)
+        if (existingComment.commentatorInfo.userId !== userInfo.id.toString())
             throw new forbiddenError('Вы не можете удалять чужие комментарии.', 'comment')
 
         await db

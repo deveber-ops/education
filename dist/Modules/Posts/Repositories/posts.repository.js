@@ -4,6 +4,7 @@ import database from '../../../Database/database.js';
 import { buildOrderBy, buildPagination } from '../../../Database/utils.js';
 import { repositoryNotFoundError, repositoryUniqueError } from '../../../Core/Errors/repository.errors.js';
 import { BlogsRepository } from '../../Blogs/Repositories/blogs.repository.js';
+import { toStringKeys } from '../../../Core/Helpers/idToString.helper.js';
 const PostsRepository = {
   async findMany(queryDto, blogId) {
     const {
@@ -38,7 +39,7 @@ const PostsRepository = {
     if (result.length === 0) {
       throw new repositoryNotFoundError("\u041F\u043E\u0441\u0442 \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D.", "id");
     }
-    return result[0];
+    return toStringKeys(result[0], ["id"]);
   },
   async create(postData, blogId) {
     const db = database.getDB();
@@ -61,7 +62,7 @@ const PostsRepository = {
       const [createdPost] = await db.insert(Posts).values(postData);
       const createdPostId = createdPost?.insertId;
       const [post] = await db.select().from(Posts).where(eq(Posts.id, createdPostId)).limit(1);
-      return post;
+      return toStringKeys(post, ["id", "blogId"]);
     } catch (error) {
       throw error;
     }

@@ -1,10 +1,11 @@
 import bcrypt from 'bcrypt';
 import {eq, or, sql} from 'drizzle-orm';
-import {User, UserInputType, UserQueryInput, UserWithoutPassword} from "../Types/user.types";
+import {User, UserInputType, UserQueryInput, UserWithoutPassword, UserWithStringId} from "../Types/user.types";
 import database from "../../../Database/database";
 import {buildOrderBy, buildPagination, buildWhereConditions} from "../../../Database/utils";
 import {Users} from "../../../Database/schema";
 import {repositoryNotFoundError, repositoryUniqueError} from "../../../Core/Errors/repository.errors";
+import {toStringKeys} from "../../../Core/Helpers/idToString.helper";
 
 export const UsersRepository = {
     async findMany(queryDto: UserQueryInput): Promise<{ items: UserWithoutPassword[]; totalCount: number }> {
@@ -56,7 +57,7 @@ export const UsersRepository = {
         return { items, totalCount };
     },
 
-    async findOne(id: number): Promise<UserWithoutPassword> {
+    async findOne(id: number): Promise<UserWithStringId> {
         const db = database.getDB();
 
         const result = await db
@@ -70,10 +71,10 @@ export const UsersRepository = {
 
         const {password: _, ...rest} = result[0];
 
-        return rest;
+        return toStringKeys(rest, ['id']) as UserWithStringId;
     },
 
-    async create(userData: UserInputType): Promise<UserWithoutPassword> {
+    async create(userData: UserInputType): Promise<UserWithStringId> {
         const db = database.getDB();
         const {login, email, password} = userData;
 
@@ -96,7 +97,8 @@ export const UsersRepository = {
                 .limit(1)
 
             const { password: _, ...userWithoutPassword } = user;
-            return userWithoutPassword;
+
+            return toStringKeys(userWithoutPassword, ['id']) as UserWithStringId;
         } catch (error: any) {
             if (error.cause.sqlMessage?.includes('user_login_idx')) {
                 throw new repositoryUniqueError('Пользователь с таким логином уже существует', 'login');

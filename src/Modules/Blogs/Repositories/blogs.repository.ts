@@ -2,8 +2,9 @@ import {eq, sql} from 'drizzle-orm';
 import database from "../../../Database/database";
 import {Blogs, Users} from "../../../Database/schema";
 import {buildOrderBy, buildPagination, buildWhereConditions} from "../../../Database/utils";
-import {Blog, BlogInputType, BlogQueryInput} from "../Types/blog.types";
+import {Blog, BlogInputType, BlogQueryInput, BlogWithStringId} from "../Types/blog.types";
 import {repositoryNotFoundError, repositoryUniqueError} from "../../../Core/Errors/repository.errors";
+import {toStringKeys} from "../../../Core/Helpers/idToString.helper";
 
 export const BlogsRepository = {
     async findMany(queryDto: BlogQueryInput): Promise<{ items: Blog[]; totalCount: number }> {
@@ -48,7 +49,7 @@ export const BlogsRepository = {
         return { items, totalCount };
     },
 
-    async findOne(id: number): Promise<Blog> {
+    async findOne(id: number): Promise<BlogWithStringId> {
         const db = database.getDB();
 
         const result = await db
@@ -60,10 +61,10 @@ export const BlogsRepository = {
             throw new repositoryNotFoundError('Блог не найден.', 'id');
         }
 
-        return result[0]
+        return toStringKeys(result[0], ['id']) as BlogWithStringId;
     },
 
-    async create(blogData: BlogInputType): Promise<Blog> {
+    async create(blogData: BlogInputType): Promise<BlogWithStringId> {
         const db = database.getDB()
 
         try {
@@ -79,7 +80,7 @@ export const BlogsRepository = {
                 .where(eq(Blogs.id, createdBlogId))
                 .limit(1)
 
-            return blog;
+            return toStringKeys(blog, ['id']) as BlogWithStringId;
         } catch (error: any) {
             if (error.cause.code === 'ER_DUP_ENTRY' || error.cause.sqlMessage?.includes('blog_name_idx')) {
                 throw new repositoryUniqueError('Блог с таким именем уже существует', 'name');

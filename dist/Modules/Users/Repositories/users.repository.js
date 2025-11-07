@@ -4,6 +4,7 @@ import database from '../../../Database/database.js';
 import { buildOrderBy, buildPagination, buildWhereConditions } from '../../../Database/utils.js';
 import { Users } from '../../../Database/schema.js';
 import { repositoryNotFoundError, repositoryUniqueError } from '../../../Core/Errors/repository.errors.js';
+import { toStringKeys } from '../../../Core/Helpers/idToString.helper.js';
 const UsersRepository = {
   async findMany(queryDto) {
     const {
@@ -34,7 +35,7 @@ const UsersRepository = {
       throw new repositoryNotFoundError("\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D.", "id");
     }
     const { password: _, ...rest } = result[0];
-    return rest;
+    return toStringKeys(rest, ["id"]);
   },
   async create(userData) {
     const db = database.getDB();
@@ -49,7 +50,7 @@ const UsersRepository = {
       });
       const [user] = await db.select().from(Users).where(eq(Users.email, email)).limit(1);
       const { password: _, ...userWithoutPassword } = user;
-      return userWithoutPassword;
+      return toStringKeys(userWithoutPassword, ["id"]);
     } catch (error) {
       if (error.cause.sqlMessage?.includes("user_login_idx")) {
         throw new repositoryUniqueError("\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C \u0441 \u0442\u0430\u043A\u0438\u043C \u043B\u043E\u0433\u0438\u043D\u043E\u043C \u0443\u0436\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442", "login");

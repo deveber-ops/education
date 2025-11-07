@@ -14,7 +14,7 @@ export function mapToCommentListPaginatedOutput(
             createdAt: comment.createdAt,
             content: comment.content,
             commentatorInfo: {
-                userId: comment.commentatorInfo.userId,
+                userId: comment.commentatorInfo.userId.toString(),
                 userLogin: comment.commentatorInfo.userLogin,
             }
         })),
