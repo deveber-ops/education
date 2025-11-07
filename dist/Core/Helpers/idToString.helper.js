@@ -5,6 +5,10 @@ function toStringKeys(item, keys) {
   }
   return result;
 }
+function toStringKeysArray(items, keys) {
+  return items.map((item) => toStringKeys(item, keys));
+}
 export {
-  toStringKeys
+  toStringKeys,
+  toStringKeysArray
 };

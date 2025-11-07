@@ -10,7 +10,7 @@ export async function deleteCommentHandler (req: Request, res: Response, next: N
         const id = parseInt(req.params.id, 10)
 
         const userId = req.userId;
-        if (!userId) return new authError('Не авторизован', 'auth')
+        if (!userId) return next(new authError('Не авторизован', 'auth'));
         const userInfo:UserInfoType = await UsersService.findOne(userId);
 
         await CommentsService.delete(id, userInfo)

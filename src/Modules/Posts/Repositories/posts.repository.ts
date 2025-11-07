@@ -70,7 +70,7 @@ export const PostsRepository = {
             throw new repositoryNotFoundError('Пост не найден.', 'id');
         }
 
-        return toStringKeys(result[0], ['id']) as PostWithStringId;
+        return toStringKeys(result[0], ['id', 'blogId']) as PostWithStringId;
     },
 
     async create(postData: PostInputType, blogId?: number | null | undefined): Promise<PostWithStringId> {

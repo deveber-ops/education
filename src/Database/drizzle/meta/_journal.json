@@ -64,6 +64,13 @@
       "when": 1762467323025,
       "tag": "0008_windy_reavers",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1762520271064,
+      "tag": "0009_secret_hardball",
+      "breakpoints": true
     }
   ]
 }

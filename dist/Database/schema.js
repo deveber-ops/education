@@ -70,7 +70,7 @@ const Posts = mysqlTable("Posts", {
 const Comments = mysqlTable("Comments", {
   id: int("id").primaryKey().autoincrement(),
   createdAt: datetime("createdAt").default(sql`CURRENT_TIMESTAMP`),
-  postId: int("postId").notNull().references(() => Posts.id, { onDelete: "cascade" }),
+  postId: int("postId").references(() => Posts.id, { onDelete: "cascade" }),
   content: varchar("content", { length: 300 }).notNull(),
   commentatorInfo: json("commentatorInfo").$type().notNull()
 });

@@ -47,7 +47,8 @@ const CommentsRepository = {
       const [createdComment] = await db.insert(Comments).values(commentData);
       const createdCommentId = createdComment?.insertId;
       const [comment] = await db.select().from(Comments).where(eq(Comments.id, createdCommentId)).limit(1);
-      return toStringKeys(comment, ["id"]);
+      const { postId: _, ...rest } = comment;
+      return toStringKeys(rest, ["id"]);
     } catch (error) {
       throw error;
     }

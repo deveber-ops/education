@@ -1,0 +1,1 @@
+ALTER TABLE `Comments` MODIFY COLUMN `postId` int;

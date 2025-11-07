@@ -15,6 +15,7 @@ export type CommentWithStringId = Omit<Comment, 'id' | 'postId' | 'commentatorIn
     };
 };
 export type CommentInputType = InferInsertModel<typeof Comments>;
+export type CommentUpdateInput = Omit<CommentInputType, 'postId' | 'id' | 'createdAt'>;
 
 export type CommentQueryInput = {
     pageNumber?: number;

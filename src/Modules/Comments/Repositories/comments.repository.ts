@@ -1,4 +1,9 @@
-import {Comment, CommentInputType, CommentQueryInput, CommentWithStringId} from "../Types/comment.types";
+import {
+    Comment,
+    CommentInputType,
+    CommentQueryInput, CommentUpdateInput,
+    CommentWithStringId
+} from "../Types/comment.types";
 import {PostsRepository} from "../../Posts/Repositories/posts.repository";
 import {repositoryNotFoundError} from "../../../Core/Errors/repository.errors";
 import database from "../../../Database/database";
@@ -92,13 +97,15 @@ export const CommentsRepository = {
                 .where(eq(Comments.id, createdCommentId))
                 .limit(1)
 
-            return toStringKeys(comment, ['id']) as CommentWithStringId;
+            const {postId: _, ...rest} = comment
+
+            return toStringKeys(rest, ['id']) as CommentWithStringId;
         } catch (error: any) {
             throw error;
         }
     },
 
-    async update(id: number, commentData: CommentInputType): Promise<void> {
+    async update(id: number, commentData: CommentUpdateInput): Promise<void> {
         const db = database.getDB();
 
         const existingComment = await this.findOne(id);

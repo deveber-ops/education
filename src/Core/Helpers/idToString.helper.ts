@@ -8,3 +8,10 @@ export function toStringKeys<T extends Record<string, unknown>, K extends keyof 
     }
     return result;
 }
+
+export function toStringKeysArray<T extends Record<string, unknown>, K extends keyof T>(
+    items: T[],
+    keys: K[]
+): Array<Omit<T, K> & { [P in K]: string }> {
+    return items.map(item => toStringKeys(item, keys));
+}

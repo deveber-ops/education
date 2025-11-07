@@ -6,7 +6,7 @@ export async function deleteBlogHandler (req: Request, res: Response, next: Next
     try {
         const id = parseInt(req.params.id, 10)
         await BlogsService.delete(id)
-        res.sendStatus(HttpStatus.Ok);
+        res.sendStatus(HttpStatus.NoContent);
     } catch (error: unknown) {
         next(error);
     }

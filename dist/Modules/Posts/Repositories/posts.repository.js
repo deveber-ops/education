@@ -39,7 +39,7 @@ const PostsRepository = {
     if (result.length === 0) {
       throw new repositoryNotFoundError("\u041F\u043E\u0441\u0442 \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D.", "id");
     }
-    return toStringKeys(result[0], ["id"]);
+    return toStringKeys(result[0], ["id", "blogId"]);
   },
   async create(postData, blogId) {
     const db = database.getDB();

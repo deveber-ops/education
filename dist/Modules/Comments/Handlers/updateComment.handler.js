@@ -9,7 +9,7 @@ async function updateCommentHandler(req, res, next) {
     if (!userId) return new authError("\u041D\u0435 \u0430\u0432\u0442\u043E\u0440\u0438\u0437\u043E\u0432\u0430\u043D", "auth");
     const userInfo = await UsersService.findOne(userId);
     const commentData = {
-      ...req.body.commentData,
+      content: req.body.content,
       commentatorInfo: {
         userId: userInfo.id,
         userLogin: userInfo.login

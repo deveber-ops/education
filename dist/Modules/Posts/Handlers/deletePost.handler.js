@@ -4,7 +4,7 @@ async function deletePostHandler(req, res, next) {
   try {
     const id = parseInt(req.params.id, 10);
     await PostsService.delete(id);
-    res.sendStatus(HttpStatus.Ok);
+    res.sendStatus(HttpStatus.NoContent);
   } catch (error) {
     next(error);
   }
