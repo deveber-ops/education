@@ -1,6 +1,6 @@
 import database from '../../Database/database.js';
-import { Blogs, Comments, Posts, Users } from '../../Database/schema.js';
 import { HttpStatus } from '../../Core/Types/httpStatuses.enum.js';
+import { sql } from "drizzle-orm";
 var config_default = {
   name: "testing",
   path: "/testing",
@@ -14,10 +14,10 @@ var config_default = {
       handler: async (req, res, next) => {
         const db = database.getDB();
         try {
-          await db.delete(Comments).execute();
-          await db.delete(Posts).execute();
-          await db.delete(Blogs).execute();
-          await db.delete(Users).execute();
+          await db.execute(sql`TRUNCATE TABLE Comments`);
+          await db.execute(sql`TRUNCATE TABLE Posts`);
+          await db.execute(sql`TRUNCATE TABLE Blogs`);
+          await db.execute(sql`TRUNCATE TABLE Users`);
           res.sendStatus(HttpStatus.NoContent);
         } catch (error) {
           next(error);

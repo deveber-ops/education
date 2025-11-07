@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import database from "../../Database/database";
-import {Blogs, Comments, Posts, Users} from "../../Database/schema";
 import {HttpStatus} from "../../Core/Types/httpStatuses.enum";
+import {sql} from "drizzle-orm";
 
 export default {
     name: 'testing',
@@ -16,10 +16,10 @@ export default {
             handler: async (req: Request, res: Response, next: NextFunction) => {
                 const db = database.getDB();
                 try {
-                    await db.delete(Comments).execute();
-                    await db.delete(Posts).execute();
-                    await db.delete(Blogs).execute();
-                    await db.delete(Users).execute();
+                    await db.execute(sql`TRUNCATE TABLE Comments`);
+                    await db.execute(sql`TRUNCATE TABLE Posts`);
+                    await db.execute(sql`TRUNCATE TABLE Blogs`);
+                    await db.execute(sql`TRUNCATE TABLE Users`);
                     res.sendStatus(HttpStatus.NoContent);
                 } catch (error) {
                     next(error);
