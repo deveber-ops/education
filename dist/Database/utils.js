@@ -1,4 +1,4 @@
-import { and, like, or, eq, desc, asc, sql } from "drizzle-orm";
+import { and, like, or, eq, sql } from "drizzle-orm";
 const buildSearchConditions = (table, options) => {
   const { search, searchFields } = options;
   if (!search || !searchFields || searchFields.length === 0) {
@@ -52,14 +52,14 @@ const buildPagination = (pageNumber = 1, pageSize = 10) => {
 const buildOrderBy = (table, sortBy, sortDirection = "asc") => {
   const column = table[sortBy];
   if (!column) {
-    throw new Error(`Column ${sortBy} not found in table`);
+    throw new Error(`Column "${sortBy}" not found in table`);
   }
-  const stringColumnTypes = ["MySqlVarChar", "MySqlText", "MySqlChar"];
-  if (stringColumnTypes.includes(column.columnType)) {
-    const lowerColumn = sql`LOWER(${column})`;
-    return sortDirection === "desc" ? desc(lowerColumn) : asc(lowerColumn);
+  const isStringColumn = ["MySqlVarChar", "MySqlText", "MySqlChar"].includes(column.columnType);
+  const direction = sortDirection.toUpperCase();
+  if (isStringColumn) {
+    return sql`${column} COLLATE utf8mb4_unicode_ci ${sql.raw(direction)}`;
   }
-  return sortDirection === "desc" ? desc(column) : asc(column);
+  return sortDirection === "desc" ? sql`${column} DESC` : sql`${column} ASC`;
 };
 function createSearchMapping(searchFields) {
   return Object.entries(searchFields).reduce((acc, [tableColumn, queryParam]) => {
