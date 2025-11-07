@@ -12,8 +12,13 @@ export interface AuthenticatedRequest extends Request {
     userId?: number;
 }
 
-const extractToken = (req: Request) => {
+export const authMiddleware = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+): Promise<Response | void> => {
     const auth = req.headers.authorization as string
+    if (!auth) return next(new authError('Не авторизован.', 'token'))
 
     let accessToken: string | undefined;
     let basicAuth: boolean = false;
@@ -32,15 +37,6 @@ const extractToken = (req: Request) => {
         accessToken = req.cookies.accessToken;
     }
 
-    return { accessToken, basicAuth };
-};
-
-export const authMiddleware = async (
-    req: AuthenticatedRequest,
-    res: Response,
-    next: NextFunction
-): Promise<Response | void> => {
-    const { accessToken, basicAuth } = extractToken(req);
     if (!accessToken) return next(new authError('Токен авторизации не передан.', 'token'))
 
     if (basicAuth) {
