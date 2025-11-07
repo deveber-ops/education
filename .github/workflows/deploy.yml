@@ -32,6 +32,26 @@ jobs:
           strip_components: 1
           overwrite: true
 
+      - name: Upload .htaccess directly
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOSTER_SSH_HOST }}
+          username: ${{ secrets.HOSTER_SSH_USER }}
+          key: ${{ secrets.HOSTER_SSH_KEY }}
+          source: ".htaccess"
+          target: "${{ secrets.HOSTER_SSH_PATH }}/.htaccess"
+          overwrite: true
+
+      - name: Upload .env.production as .env
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOSTER_SSH_HOST }}
+          username: ${{ secrets.HOSTER_SSH_USER }}
+          key: ${{ secrets.HOSTER_SSH_KEY }}
+          source: ".env.production"
+          target: "${{ secrets.HOSTER_SSH_PATH }}/.env"
+          overwrite: true
+
       - name: Sync dist to project root with exclusions
         uses: appleboy/ssh-action@v0.1.10
         with:
@@ -72,14 +92,6 @@ jobs:
             --user ${{ secrets.HOSTER_SSH_USER }} \
             --app-root ${{ secrets.HOSTER_SSH_PATH }} \
             --script-name setup
-            
-            echo "📦 Генерация клиента Drizzle..."
-            cloudlinux-selector run-script \
-            --json \
-            --interpreter nodejs \
-            --user ${{ secrets.HOSTER_SSH_USER }} \
-            --app-root ${{ secrets.HOSTER_SSH_PATH }} \
-            --script-name dbGenerate
 
       - name: Restart application
         uses: appleboy/ssh-action@v0.1.10
