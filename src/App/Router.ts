@@ -302,6 +302,10 @@ export async function loadRoutes(): Promise<{ router: express.Router; modulesCon
             if (routeHandler && configData?.handler) {
                 const middlewareChain: express.RequestHandler[] = [];
 
+                if (actionAuth) {
+                    middlewareChain.push(authMiddleware);
+                }
+
                 middlewareChain.push(createModuleActiveMiddleware(moduleActive));
 
                 if (configData.middlewares && configData.middlewares.length > 0) {
@@ -309,10 +313,6 @@ export async function loadRoutes(): Promise<{ router: express.Router; modulesCon
                 }
 
                 middlewareChain.push(createRouteInfoMiddleware(dbModule.name, dbAction.name, actionAuth));
-
-                if (actionAuth) {
-                    middlewareChain.push(authMiddleware);
-                }
 
                 middlewareChain.push(configData.handler);
 

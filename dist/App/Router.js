@@ -189,14 +189,14 @@ async function loadRoutes() {
       const configData = await getHandlerFromConfig(dbModule.name, dbAction.name);
       if (routeHandler && configData?.handler) {
         const middlewareChain = [];
+        if (actionAuth) {
+          middlewareChain.push(authMiddleware);
+        }
         middlewareChain.push(createModuleActiveMiddleware(moduleActive));
         if (configData.middlewares && configData.middlewares.length > 0) {
           middlewareChain.push(...configData.middlewares);
         }
         middlewareChain.push(createRouteInfoMiddleware(dbModule.name, dbAction.name, actionAuth));
-        if (actionAuth) {
-          middlewareChain.push(authMiddleware);
-        }
         middlewareChain.push(configData.handler);
         routeHandler(fullPath, ...middlewareChain);
         currentRoutes.set(`${dbModule.name}.${dbAction.name}`, {
