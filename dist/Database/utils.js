@@ -52,12 +52,12 @@ const buildPagination = (pageNumber = 1, pageSize = 10) => {
 const buildOrderBy = (table, sortBy, sortDirection = "asc") => {
   const column = table[sortBy];
   if (!column) {
-    throw new Error(`Column ${sortBy} not found in table`);
+    throw new Error(`Column "${sortBy}" not found in table`);
   }
-  const stringColumnTypes = ["MySqlVarChar", "MySqlText", "MySqlChar"];
-  if (stringColumnTypes.includes(column.columnType)) {
-    const lowerColumn = sql`LOWER(${column})`;
-    return sortDirection === "desc" ? desc(lowerColumn) : asc(lowerColumn);
+  const isStringColumn = ["MySqlVarChar", "MySqlText", "MySqlChar"].includes(column.columnType);
+  const direction = sortDirection.toUpperCase();
+  if (isStringColumn) {
+    return sql.raw(`\`${column.name}\` COLLATE utf8mb4_unicode_ci ${direction}`);
   }
   return sortDirection === "desc" ? desc(column) : asc(column);
 };
