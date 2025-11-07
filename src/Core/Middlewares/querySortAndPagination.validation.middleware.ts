@@ -23,21 +23,18 @@ export function paginationAndSortingValidation<T extends string>(
         query('pageNumber')
             .optional()
             .default(DEFAULT_PAGE_NUMBER)
-            .isInt({ min: 1 })
             .withMessage('Page number must be a positive integer')
             .toInt(),
 
         query('pageSize')
             .optional()
             .default(DEFAULT_PAGE_SIZE)
-            .isInt({ min: 1, max: 1000 })
             .withMessage('Page size must be between 1 and 1000')
             .toInt(),
 
         query('sortBy')
             .optional()
-            .default(Object.values(sortFieldsEnum)[0]) // Первое значение enum как дефолтное
-            .isIn(allowedSortFields)
+            .default(Object.values(sortFieldsEnum)[0])
             .withMessage(
                 `Invalid sort field. Allowed values: ${allowedSortFields.join(', ')}`,
             ),
@@ -45,7 +42,6 @@ export function paginationAndSortingValidation<T extends string>(
         query('sortDirection')
             .optional()
             .default(DEFAULT_SORT_DIRECTION)
-            .isIn(Object.values(SortDirection))
             .withMessage(
                 `Sort direction must be one of: ${Object.values(SortDirection).join(', ')}`,
             ),
