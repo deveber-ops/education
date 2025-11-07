@@ -13,20 +13,16 @@ const buildSearchConditions = (table, options) => {
 const buildWhereConditions = (table, options) => {
   const conditions = [];
   const { searchFieldsMapping, filters } = options;
-  if (searchFieldsMapping) {
-    const searchConditions = [];
+  if (searchFieldsMapping && filters) {
     Object.entries(searchFieldsMapping).forEach(([queryParam, tableColumn]) => {
-      const searchValue = filters?.[queryParam];
+      const searchValue = filters[queryParam];
       if (searchValue && typeof searchValue === "string") {
         const column = table[tableColumn];
         if (column) {
-          searchConditions.push(like(column, `%${searchValue}%`));
+          conditions.push(like(column, `%${searchValue}%`));
         }
       }
     });
-    if (searchConditions.length > 0) {
-      conditions.push(or(...searchConditions));
-    }
   }
   if (filters) {
     Object.entries(filters).forEach(([key, value]) => {

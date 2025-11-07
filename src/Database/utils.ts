@@ -44,29 +44,26 @@ export const buildWhereConditions = (
     const conditions: SQL[] = [];
     const { searchFieldsMapping, filters } = options;
 
-    if (searchFieldsMapping) {
-        const searchConditions: SQL[] = [];
-
+    if (searchFieldsMapping && filters) {
+        // Используем AND вместо OR для объединения условий
         Object.entries(searchFieldsMapping).forEach(([queryParam, tableColumn]) => {
-            const searchValue = filters?.[queryParam];
+            const searchValue = filters[queryParam];
 
             if (searchValue && typeof searchValue === 'string') {
                 const column = table[tableColumn as keyof typeof table] as MySqlColumn | undefined;
                 if (column) {
-                    searchConditions.push(like(column, `%${searchValue}%`));
+                    // Каждое условие добавляется отдельно (AND по умолчанию)
+                    conditions.push(like(column, `%${searchValue}%`));
                 }
             }
         });
-
-        if (searchConditions.length > 0) {
-            conditions.push(<SQL<unknown>>or(...searchConditions));
-        }
     }
 
+    // Добавляем обычные фильтры (исключая search поля)
     if (filters) {
         Object.entries(filters).forEach(([key, value]) => {
             if (searchFieldsMapping && key in searchFieldsMapping) {
-                return;
+                return; // Пропускаем search поля, они уже обработаны
             }
 
             if (value !== undefined && value !== null) {
