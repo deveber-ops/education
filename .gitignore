@@ -1,3 +1,4 @@
+.htaccess
 .env.production
 .env
 pnpm-lock.yaml

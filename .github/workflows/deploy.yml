@@ -73,7 +73,7 @@ jobs:
             --app-root ${{ secrets.HOSTER_SSH_PATH }} \
             --script-name setup
             
-            echo "📦 Установка production-зависимостей..."
+            echo "📦 Генерация клиента Drizzle..."
             cloudlinux-selector run-script \
             --json \
             --interpreter nodejs \
