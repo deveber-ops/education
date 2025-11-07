@@ -3,18 +3,12 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath, pathToFileURL } from "url";
 import { HttpStatus } from '../Core/Types/httpStatuses.enum.js';
-import cookieParser from "cookie-parser";
-import { detectClientTypeMiddleware } from '../Core/Middlewares/detectClientType.middleware.js';
 import { ModulesRepository } from '../Modules/Modules/Repositories/modules.repository.js';
 import { authMiddleware } from '../Modules/Auth/Middlewares/auth.middleware.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const modulesPath = path.resolve(__dirname, "../Modules");
 const router = express.Router();
-router.use(express.json());
-router.use(express.urlencoded({ extended: true }));
-router.use(cookieParser());
-router.use(detectClientTypeMiddleware);
 const consoleOutput = true;
 let globalModulesConfig = { modules: [] };
 const methodMap = {

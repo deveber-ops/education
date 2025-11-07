@@ -9,6 +9,8 @@ export const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
 export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 export async function authMiddleware(req: Request, res: Response, next: NextFunction) {
+    console.log('Headers:', req.headers);
+    console.log('Cookies:', req.cookies);
     try {
         const authHeader = req.headers.authorization;
         const cookieToken = req.cookies?.accessToken;

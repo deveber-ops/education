@@ -6,6 +6,8 @@ const ACCESS_TOKEN_SECRET = process.env.JWT_SECRET;
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 async function authMiddleware(req, res, next) {
+  console.log("Headers:", req.headers);
+  console.log("Cookies:", req.cookies);
   try {
     const authHeader = req.headers.authorization;
     const cookieToken = req.cookies?.accessToken;

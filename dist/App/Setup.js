@@ -8,11 +8,17 @@ import * as dotenv from "dotenv";
 dotenv.config();
 const setupApp = async (app) => {
   await database.connect();
-  app.use(express.json({ limit: "10mb" }));
-  app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+  app.use((req, res, next) => {
+    if (!req.headers["content-type"]) {
+      req.headers["content-type"] = "application/json";
+    }
+    next();
+  });
+  const { router } = await loadRoutes();
+  app.use(express.json({ limit: "10mb", strict: false }));
+  app.use(express.urlencoded({ extended: true, limit: "10mb", type: "*/*" }));
   app.use(cookieParser());
   app.use(detectClientTypeMiddleware);
-  const { router } = await loadRoutes();
   app.use(router);
   app.use(errorsMiddleware);
   return app;
