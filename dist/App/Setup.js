@@ -9,7 +9,7 @@ dotenv.config();
 const setupApp = async (app) => {
   await database.connect();
   app.use((req, res, next) => {
-    if (!req.headers["content-type"]) {
+    if (!req.headers["content-type"] && ["POST", "PUT", "PATCH"].includes(req.method) && req.body !== void 0) {
       req.headers["content-type"] = "application/json";
     }
     next();

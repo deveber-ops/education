@@ -11,7 +11,9 @@ export const setupApp = async (app: Express) => {
     await database.connect();
 
     app.use((req: Request, res: Response, next: NextFunction) => {
-        if (!req.headers['content-type']) {
+        if (!req.headers['content-type'] &&
+            ['POST', 'PUT', 'PATCH'].includes(req.method) &&
+            req.body !== undefined) {
             req.headers['content-type'] = 'application/json';
         }
         next();
