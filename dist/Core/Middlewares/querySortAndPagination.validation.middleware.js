@@ -13,12 +13,12 @@ const paginationAndSortingDefault = {
 function paginationAndSortingValidation(sortFieldsEnum) {
   const allowedSortFields = Object.values(sortFieldsEnum);
   return [
-    query("pageNumber").optional().default(DEFAULT_PAGE_NUMBER).withMessage("Page number must be a positive integer").toInt(),
-    query("pageSize").optional().default(DEFAULT_PAGE_SIZE).withMessage("Page size must be between 1 and 1000").toInt(),
-    query("sortBy").optional().default(Object.values(sortFieldsEnum)[0]).withMessage(
+    query("pageNumber").optional().default(DEFAULT_PAGE_NUMBER).toInt(),
+    query("pageSize").optional().default(DEFAULT_PAGE_SIZE).toInt(),
+    query("sortBy").optional().default(Object.values(sortFieldsEnum)[0]).isIn(allowedSortFields).withMessage(
       `Invalid sort field. Allowed values: ${allowedSortFields.join(", ")}`
     ),
-    query("sortDirection").optional().default(DEFAULT_SORT_DIRECTION).withMessage(
+    query("sortDirection").optional().default(DEFAULT_SORT_DIRECTION).isIn(Object.values(SortDirection)).withMessage(
       `Sort direction must be one of: ${Object.values(SortDirection).join(", ")}`
     )
   ];

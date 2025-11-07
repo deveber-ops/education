@@ -60,9 +60,6 @@ async function reloadRoutes() {
 async function loadModuleConfig(moduleName) {
   const configTsPath = path.join(modulesPath, moduleName, "config.ts");
   const configJsPath = path.join(modulesPath, moduleName, "config.js");
-  console.log(`\u{1F50D} Looking for config in: ${moduleName}`);
-  console.log(`   TS path: ${configTsPath}`);
-  console.log(`   JS path: ${configJsPath}`);
   let configPath = null;
   if (fs.existsSync(configJsPath)) {
     configPath = configJsPath;

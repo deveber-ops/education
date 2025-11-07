@@ -151,7 +151,6 @@ const ModulesRepository = {
           });
         }
       }
-      console.log(`\u2705 Successfully synced module: ${name}`);
     } catch (error) {
       console.error(`\u274C Failed to sync module ${name}:`, error);
       throw error;

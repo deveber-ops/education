@@ -114,10 +114,6 @@ async function loadModuleConfig(moduleName: string): Promise<ModuleConfig | null
     const configTsPath = path.join(modulesPath, moduleName, 'config.ts');
     const configJsPath = path.join(modulesPath, moduleName, 'config.js');
 
-    console.log(`🔍 Looking for config in: ${moduleName}`);
-    console.log(`   TS path: ${configTsPath}`);
-    console.log(`   JS path: ${configJsPath}`);
-
     let configPath: string | null = null;
 
     if (fs.existsSync(configJsPath)) {

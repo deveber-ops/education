@@ -253,8 +253,6 @@ export const ModulesRepository = {
                 }
             }
 
-            console.log(`✅ Successfully synced module: ${name}`);
-
         } catch (error) {
             console.error(`❌ Failed to sync module ${name}:`, error);
             throw error;
