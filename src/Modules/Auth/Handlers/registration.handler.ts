@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { registrationServices } from "../Services/registrationSession.service";
 import { sendVerificationEmail } from "../../../Core/Mailer/mailer";
 import { HttpStatus } from "../../../Core/Types/httpStatuses.enum";
+import {verificationError} from "../../../Core/Errors/verification.errors";
 
 export const registrationHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -20,7 +21,8 @@ export const registrationHandler = async (req: Request, res: Response, next: Nex
 
         if (path === '/api/auth/registration-email-resending' && !req.isVerified) {
             try {
-                await registrationServices.getActiveSession(email);
+                const activeSession = await registrationServices.getActiveSession(email);
+                if (!activeSession) return new verificationError('Email не найден или верификация пользователя уже завершена.', 'verification')
                 const newVerificationCode  = await registrationServices.generateVerificationCode();
                 await registrationServices.updateVerificationCode(email, newVerificationCode.verificationCode, newVerificationCode.expiresAt);
                 await sendVerificationEmail(email, newVerificationCode.verificationCode);
