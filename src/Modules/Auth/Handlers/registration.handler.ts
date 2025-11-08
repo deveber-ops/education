@@ -22,7 +22,7 @@ export const registrationHandler = async (req: Request, res: Response, next: Nex
         if (path === '/api/auth/registration-email-resending' && !req.isVerified) {
             try {
                 const activeSession = await registrationServices.getActiveSession(email);
-                if (!activeSession) return new verificationError('Email не найден или верификация пользователя уже завершена.', 'verification')
+                if (!activeSession) throw new verificationError('Пользователь не найден или верификация пользователя уже завершена.', 'verification')
                 const newVerificationCode  = await registrationServices.generateVerificationCode();
                 await registrationServices.updateVerificationCode(email, newVerificationCode.verificationCode, newVerificationCode.expiresAt);
                 await sendVerificationEmail(email, newVerificationCode.verificationCode);
