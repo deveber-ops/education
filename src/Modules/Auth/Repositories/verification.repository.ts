@@ -1,37 +1,68 @@
 import database from "../../../Database/database";
-import { and, eq, gt } from "drizzle-orm";
+import {and, eq, gt} from "drizzle-orm";
 import { registrationSessionsType } from "../Types/auth.types";
-import { registrationSessions } from "../../../Database/schema";
+import {registrationSessions} from "../../../Database/schema";
+import {verificationError} from "../../../Core/Errors/verification.errors";
+import {UsersService} from "../../Users/Services/users.service";
 import bcrypt from "bcrypt";
 
 export const registrationRepository = {
-    async createSession(userData: { email: string; login: string; password: string }, verificationCode: string, expiresAt: Date): Promise<registrationSessionsType> {
-        const { email, login, password } = userData;
+    async createSession(
+        userData: { email: string; login: string; password: string },
+        verificationCode: string,
+        expiresAt: Date
+    ): Promise<registrationSessionsType> {
+        try {
+            const db = database.getDB()
+            const now = new Date();
+            const { email, login, password } = userData;
 
-        const salt = await bcrypt.genSalt(10);
-        const passwordHash = await bcrypt.hash(password, salt);
+            const existingUser = await UsersService.findUser(email);
+            if (existingUser) {
+                throw new verificationError("Пользователь с таким email уже существует", "email");
+            }
 
-        const now = new Date();
+            const salt = await bcrypt.genSalt(10);
+            const passwordHash = await bcrypt.hash(password, salt);
 
-        const [session] = await database.getDB()
-            .insert(registrationSessions)
-            .values({
-                email,
-                login,
-                password: passwordHash,
-                verificationCode,
-                lastSentAt: now,
-                expiresAt
-            })
+            await db
+                .insert(registrationSessions)
+                .values({
+                    email: email,
+                    login: login,
+                    password: passwordHash,
+                    verificationCode: verificationCode,
+                    lastSentAt: now,
+                    expiresAt: expiresAt
+                });
 
-        if (!session) {
-            throw new Error("Failed to create registration session");
+            const [session] = await db
+                .select()
+                .from(registrationSessions)
+                .where(eq(registrationSessions.email, email))
+                .limit(1)
+
+            if (!session) {
+                throw new Error("Failed to create registration session");
+            }
+
+            return session;
+        } catch (error: any) {
+            if (error.cause.code === 'ER_DUP_ENTRY') {
+                throw new verificationError("Пользователь с таким email уже существует", "email");
+            }
+            throw error;
         }
-
-        return session;
     },
 
-    async getActiveSessionByEmail(email: string): Promise<registrationSessionsType | null> {
+    async updateVerificationCode(email: string, verificationCode: string, expiresAt: Date): Promise<void> {
+        await database.getDB()
+            .update(registrationSessions)
+            .set({verificationCode, expiresAt})
+            .where(eq(registrationSessions.email, email));
+    },
+
+    async getActiveSession(email: string): Promise<registrationSessionsType | null> {
         const now = new Date();
 
         const [session] = await database.getDB()
@@ -68,34 +99,16 @@ export const registrationRepository = {
     async verifySession(verificationCode: string): Promise<boolean> {
         const session = await this.getActiveSessionByCode(verificationCode);
 
-        if (!session) return false;
+        if (!session) throw new verificationError("Код подтверждения просрочен или недействителен.", 'code');
+
+        const {login, email, password} = session;
 
         await database.getDB()
             .update(registrationSessions)
             .set({ isVerified: true })
             .where(eq(registrationSessions.verificationCode, verificationCode));
 
-        return true;
-    },
-
-    async resendVerificationCode(email: string, newCode: string): Promise<boolean> {
-        const session = await this.getActiveSessionByEmail(email);
-
-        if (!session) return false;
-
-        const timeSinceLastSend = Date.now() - session.lastSentAt.getTime();
-        if (timeSinceLastSend < 60 * 1000) return false;
-
-        const now = new Date();
-
-        await database.getDB()
-            .update(registrationSessions)
-            .set({
-                verificationCode: newCode,
-                lastSentAt: now,
-                attempts: 0
-            })
-            .where(eq(registrationSessions.email, email));
+        await UsersService.create({login, email, password}, true)
 
         return true;
     },

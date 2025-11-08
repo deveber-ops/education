@@ -36,8 +36,6 @@ export const UsersRepository = {
             filters: searchFilters,
         });
 
-        console.log(whereConditions)
-
         let query = db.select().from(Users);
 
         if (whereConditions) {
@@ -78,13 +76,13 @@ export const UsersRepository = {
         return toStringKeys(rest, ['id']) as UserWithStringId;
     },
 
-    async create(userData: UserInputType): Promise<UserWithStringId> {
+    async create(userData: UserInputType, passwordHashed?: boolean): Promise<UserWithStringId> {
         const db = database.getDB();
         const {email, login, password} = userData;
 
         try {
             const salt = await bcrypt.genSalt(10);
-            const passwordHash = await bcrypt.hash(password, salt);
+            const passwordHash = passwordHashed ? password : await bcrypt.hash(password, salt);
 
             await db
                 .insert(Users)
@@ -109,7 +107,6 @@ export const UsersRepository = {
             } else if (error.cause.sqlMessage?.includes('user_email_idx')) {
                 throw new repositoryUniqueError('Пользователь с таким email уже существует', 'email');
             }
-
             throw error;
         }
     },
