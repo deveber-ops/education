@@ -23,7 +23,7 @@ export const registrationRepository = {
             ]);
 
             if (existingUserForEmail) {
-                throw new verificationError("Пользователь с таким email уже существует", "email");
+                throw new verificationError("Пользователь с таким email уже существует", "login");
             }
             if (existingUserForLogin) {
                 throw new verificationError("Пользователь с таким login уже существует", "login");
