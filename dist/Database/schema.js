@@ -46,7 +46,7 @@ const Users = mysqlTable("Users", {
 const registrationSessions = mysqlTable("registrationSessions", {
   id: int("id").primaryKey().autoincrement(),
   email: varchar("email", { length: 100 }).notNull().unique(),
-  login: varchar("login", { length: 100 }).unique().notNull(),
+  login: varchar("login", { length: 100 }).notNull(),
   password: varchar("password", { length: 100 }).notNull(),
   verificationCode: varchar("verificationCode", { length: 32 }).notNull(),
   createdAt: datetime("createdAt", { fsp: 6 }).default(sql`CURRENT_TIMESTAMP(6)`),

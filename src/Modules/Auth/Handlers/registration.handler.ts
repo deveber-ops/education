@@ -13,53 +13,54 @@ export const registrationHandler = async (req: Request, res: Response, next: Nex
             const isVerified = await registrationServices.verifySession(code);
 
             if (!isVerified) {
+                req.isVerified = false;
                 return next(new verificationError("Неверный или просроченный код подтверждения", "code"));
             }
 
             await registrationServices.deleteSession(code);
-
+            req.isVerified = true;
             return res.sendStatus(HttpStatus.NoContent)
         }
 
         const existingUser = await UsersService.findUser(email);
+
         if (existingUser) {
+            req.isVerified = false;
             return next(new verificationError("Пользователь с таким email уже существует", "email"));
         }
 
-        // Проверка активной сессии
         const activeSession = await registrationServices.getActiveSessionByEmail(email);
 
-        if (activeSession && !activeSession.isVerified) {
+        if (activeSession && !req.isVerified) {
             const resendResult = await registrationServices.resendVerificationCode(email);
 
             if (resendResult.success) {
                 try {
+                    console.log('Resending code start');
                     await sendVerificationEmail(email, resendResult.newCode!);
+                    console.log('Resending code success send' + resendResult.newCode);
                 } catch (mailErr) {
                     return res.sendStatus(HttpStatus.ServiceUnavailable);
                 }
-
-                return res.sendStatus(HttpStatus.NoContent)
             }
+
+            res.sendStatus(HttpStatus.NoContent);
         }
 
         if (!activeSession) {
             const newRegisterSession = await registrationServices.createSession({ email, password, login });
 
             try {
+                console.log('Start creating new session');
                 await sendVerificationEmail(email, newRegisterSession.verificationCode);
+
+                console.log('Create new registration session');
+
+                return res.sendStatus(HttpStatus.NoContent);
             } catch (mailErr) {
                 return res.sendStatus(HttpStatus.ServiceUnavailable)
             }
-
-            return res.sendStatus(HttpStatus.NoContent);
         }
-
-        if (activeSession.isVerified) {
-            return next(new verificationError("Email уже подтвержден", "email"));
-        }
-
-        return res.status(HttpStatus.BadRequest)
     } catch (error: any) {
         console.error("Registration handler error:", error);
         next(error);
