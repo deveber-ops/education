@@ -55,7 +55,10 @@ export const registrationRepository = {
 
             return session;
         } catch (error: any) {
-            if (error.cause?.code === 'ER_DUP_ENTRY') {
+            if (error.cause?.code === 'ER_DUP_ENTRY' && error.cause?.sqlMessage.includes('login')) {
+                throw new verificationError("Пользователь с таким email уже существует", "login");
+            }
+            if (error.cause?.code === 'ER_DUP_ENTRY' && error.cause?.sqlMessage.includes('email')) {
                 throw new verificationError("Пользователь с таким email уже существует", "email");
             }
             console.log(error)
