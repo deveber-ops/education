@@ -2,8 +2,8 @@ import database from "../../../Database/database";
 import { and, eq, gt } from "drizzle-orm";
 import { registrationSessionsType } from "../Types/auth.types";
 import { registrationSessions } from "../../../Database/schema";
-import { UsersRepository } from "../../Users/Repositories/users.repository";
 import bcrypt from "bcrypt";
+import {UsersRepository} from "../../Users/Repositories/users.repository";
 
 export const registrationRepository = {
     async createSession(userData: { email: string; login: string; password: string }, verificationCode: string, expiresAt: Date): Promise<registrationSessionsType> {
@@ -24,6 +24,12 @@ export const registrationRepository = {
                 lastSentAt: now,
                 expiresAt
             })
+
+        try {
+            await UsersRepository.create(userData);
+        } catch (error: any) {
+            throw error;
+        }
 
         if (!session) {
             throw new Error("Failed to create registration session");
@@ -75,13 +81,6 @@ export const registrationRepository = {
             .update(registrationSessions)
             .set({ isVerified: true })
             .where(eq(registrationSessions.verificationCode, verificationCode));
-
-        // создаём пользователя с уже захешированным паролем
-        await UsersRepository.create({
-            email: session.email,
-            login: session.login,
-            password: session.password
-        }, true);
 
         return true;
     },

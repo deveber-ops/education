@@ -78,23 +78,20 @@ export const UsersRepository = {
         return toStringKeys(rest, ['id']) as UserWithStringId;
     },
 
-    async create(userData: UserInputType, passwordHashed?: boolean): Promise<UserWithStringId> {
+    async create(userData: UserInputType): Promise<UserWithStringId> {
         const db = database.getDB();
-        const {login, email, password} = userData;
+        const {email, login, password} = userData;
 
         try {
-            let passwordHash;
-            if (passwordHashed) {
-                const salt = await bcrypt.genSalt(10);
-                passwordHash = await bcrypt.hash(password, salt);
-            }
+            const salt = await bcrypt.genSalt(10);
+            const passwordHash = await bcrypt.hash(password, salt);
 
             await db
                 .insert(Users)
                 .values({
                     login,
                     email,
-                    password: passwordHashed ? password : passwordHash,
+                    password: passwordHash,
                 });
 
             const [user] = await db

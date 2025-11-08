@@ -1,4 +1,3 @@
-import { UsersService } from '../../Users/Services/users.service.js';
 import { verificationError } from '../../../Core/Errors/verification.errors.js';
 import { registrationServices } from '../Services/registrationSession.service.js';
 import { sendVerificationEmail } from '../../../Core/Mailer/mailer.js';
@@ -15,11 +14,6 @@ const registrationHandler = async (req, res, next) => {
       await registrationServices.deleteSession(code);
       req.isVerified = true;
       return res.sendStatus(HttpStatus.NoContent);
-    }
-    const existingUser = await UsersService.findUser(email);
-    if (existingUser) {
-      req.isVerified = false;
-      return next(new verificationError("\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C \u0441 \u0442\u0430\u043A\u0438\u043C email \u0443\u0436\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442", "email"));
     }
     const activeSession = await registrationServices.getActiveSessionByEmail(email);
     if (activeSession && !req.isVerified) {

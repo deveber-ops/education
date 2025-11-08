@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import { UsersService } from "../../Users/Services/users.service";
 import { verificationError } from "../../../Core/Errors/verification.errors";
 import { registrationServices } from "../Services/registrationSession.service";
 import { sendVerificationEmail } from "../../../Core/Mailer/mailer";
@@ -20,13 +19,6 @@ export const registrationHandler = async (req: Request, res: Response, next: Nex
             await registrationServices.deleteSession(code);
             req.isVerified = true;
             return res.sendStatus(HttpStatus.NoContent)
-        }
-
-        const existingUser = await UsersService.findUser(email);
-
-        if (existingUser) {
-            req.isVerified = false;
-            return next(new verificationError("Пользователь с таким email уже существует", "email"));
         }
 
         const activeSession = await registrationServices.getActiveSessionByEmail(email);
