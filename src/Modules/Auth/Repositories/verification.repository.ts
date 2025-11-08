@@ -17,10 +17,17 @@ export const registrationRepository = {
             const now = new Date();
             const { email, login, password } = userData;
 
-            const existingUserForEmail = await UsersService.findUser(email);
-            const existingUserForLogin = await UsersService.findUser(login);
-            if (existingUserForEmail) throw new verificationError("Пользователь с таким email уже существует", "email");
-            if (existingUserForLogin) throw new verificationError("Пользователь с таким login уже существует", "login");
+            const [existingUserForEmail, existingUserForLogin] = await Promise.all([
+                UsersService.findUser(email),
+                UsersService.findUser(login)
+            ]);
+
+            if (existingUserForEmail) {
+                throw new verificationError("Пользователь с таким email уже существует", "email");
+            }
+            if (existingUserForLogin) {
+                throw new verificationError("Пользователь с таким login уже существует", "login");
+            }
 
             const salt = await bcrypt.genSalt(10);
             const passwordHash = await bcrypt.hash(password, salt);
