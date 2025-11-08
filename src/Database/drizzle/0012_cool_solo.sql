@@ -1,0 +1,1 @@
+ALTER TABLE `registrationSessions` RENAME COLUMN `code` TO `verificationCode`;

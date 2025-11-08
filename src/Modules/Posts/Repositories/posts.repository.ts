@@ -27,7 +27,7 @@ export const PostsRepository = {
         const db = database.getDB();
 
         const pagination = buildPagination(pageNumber, pageSize);
-        const orderBy = buildOrderBy(Posts, sortBy, sortDirection);
+        const orderBy = buildOrderBy(Posts, sortBy ?? 'createdAt', sortDirection);
 
         // Базовый запрос для items
         let itemsQuery = db

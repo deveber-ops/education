@@ -48,16 +48,19 @@ const UsersRepository = {
     const { password: _, ...rest } = result[0];
     return toStringKeys(rest, ["id"]);
   },
-  async create(userData) {
+  async create(userData, passwordHashed) {
     const db = database.getDB();
     const { login, email, password } = userData;
     try {
-      const salt = await bcrypt.genSalt(10);
-      const passwordHash = await bcrypt.hash(password, salt);
+      let passwordHash;
+      if (passwordHashed) {
+        const salt = await bcrypt.genSalt(10);
+        passwordHash = await bcrypt.hash(password, salt);
+      }
       await db.insert(Users).values({
         login,
         email,
-        password: passwordHash
+        password: passwordHashed ? password : passwordHash
       });
       const [user] = await db.select().from(Users).where(eq(Users.email, email)).limit(1);
       const { password: _, ...userWithoutPassword } = user;

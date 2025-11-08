@@ -5,6 +5,7 @@ import {FieldValidationError, ValidationError} from "express-validator";
 import {authError} from "./auth.errors";
 import {errorDto, errorType} from "../Types/error.types";
 import {forbiddenError} from "./forbidden.errors";
+import {verificationError} from "./verification.errors";
 
 export const formatErrors = (error: ValidationError): errorType => {
     const expressError = error as unknown as FieldValidationError;
@@ -47,6 +48,12 @@ export const errorsMiddleware = (
 
     if (err instanceof forbiddenError) {
         return res.status(HttpStatus.Forbidden).json(
+            createErrorMessages([{ message: err.message, field: err.field }])
+        );
+    }
+
+    if (err instanceof verificationError) {
+        return res.status(HttpStatus.BadRequest).json(
             createErrorMessages([{ message: err.message, field: err.field }])
         );
     }

@@ -2,6 +2,7 @@ import { repositoryNotFoundError, repositoryUniqueError } from './repository.err
 import { HttpStatus } from '../Types/httpStatuses.enum.js';
 import { authError } from './auth.errors.js';
 import { forbiddenError } from './forbidden.errors.js';
+import { verificationError } from './verification.errors.js';
 const formatErrors = (error) => {
   const expressError = error;
   return {
@@ -30,6 +31,11 @@ const errorsMiddleware = (err, req, res, next) => {
   }
   if (err instanceof forbiddenError) {
     return res.status(HttpStatus.Forbidden).json(
+      createErrorMessages([{ message: err.message, field: err.field }])
+    );
+  }
+  if (err instanceof verificationError) {
+    return res.status(HttpStatus.BadRequest).json(
       createErrorMessages([{ message: err.message, field: err.field }])
     );
   }

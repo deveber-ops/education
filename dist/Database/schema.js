@@ -43,9 +43,21 @@ const Users = mysqlTable("Users", {
   uniqueIndex("user_login_idx").on(table.login),
   uniqueIndex("user_email_idx").on(table.email)
 ]);
+const registrationSessions = mysqlTable("registrationSessions", {
+  id: int("id").primaryKey().autoincrement(),
+  email: varchar("email", { length: 100 }).notNull().unique(),
+  login: varchar("login", { length: 100 }).unique().notNull(),
+  password: varchar("password", { length: 100 }).notNull(),
+  verificationCode: varchar("verificationCode", { length: 32 }).notNull(),
+  createdAt: datetime("createdAt", { fsp: 6 }).default(sql`CURRENT_TIMESTAMP(6)`),
+  lastSentAt: datetime("lastSentAt", { fsp: 6 }).notNull(),
+  expiresAt: datetime("expiresAt", { fsp: 6 }).notNull(),
+  attempts: int("attempts").default(0),
+  isVerified: boolean("isVerified").default(false)
+});
 const userTokens = mysqlTable("User_Tokens", {
   id: int("id").primaryKey().autoincrement(),
-  userId: int("userId").notNull().references(() => Users.id, { onDelete: "cascade" }),
+  email: int("userId").notNull().references(() => Users.id, { onDelete: "cascade" }),
   token: varchar("token", { length: 255 }).notNull(),
   expiresAt: datetime("expiresAt", { fsp: 6 }).notNull(),
   createdAt: datetime("createdAt", { fsp: 6 }).default(sql`CURRENT_TIMESTAMP(6)`)
@@ -81,5 +93,6 @@ export {
   Users,
   moduleActions,
   modules,
+  registrationSessions,
   userTokens
 };

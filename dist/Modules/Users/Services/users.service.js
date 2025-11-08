@@ -6,8 +6,11 @@ const UsersService = {
   async findOne(id) {
     return await UsersRepository.findOne(id);
   },
-  async create(userDto) {
-    return await UsersRepository.create(userDto);
+  async findUser(loginOrEmail) {
+    return await UsersRepository.findUser(loginOrEmail);
+  },
+  async create(userDto, passwordHashed) {
+    return await UsersRepository.create(userDto, passwordHashed);
   },
   async delete(id) {
     return await UsersRepository.delete(id);

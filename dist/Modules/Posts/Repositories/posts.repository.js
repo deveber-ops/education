@@ -19,7 +19,7 @@ const PostsRepository = {
     }
     const db = database.getDB();
     const pagination = buildPagination(pageNumber, pageSize);
-    const orderBy = buildOrderBy(Posts, sortBy, sortDirection);
+    const orderBy = buildOrderBy(Posts, sortBy ?? "createdAt", sortDirection);
     let itemsQuery = db.select().from(Posts).orderBy(orderBy).limit(pagination.limit).offset(pagination.offset);
     let countQuery = db.select({ count: sql`count(*)` }).from(Posts);
     if (blogId) {

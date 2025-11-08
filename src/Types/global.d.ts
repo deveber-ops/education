@@ -5,6 +5,7 @@ declare global {
         interface Request {
             userId?: number;
             clientType?: string;
+            isVerified?: boolean;
         }
 
         interface Response {

@@ -1,14 +1,14 @@
 import bcrypt from "bcrypt";
-import {LoginDto, UserAuthType} from "../Types/login.dto";
+import {AuthTypes, UserAuthType} from "../Types/auth.types";
 import {generateAccessToken} from "./token.service";
 import {authError} from "../../../Core/Errors/auth.errors";
-import {UsersRepository} from "../../Users/Repositories/users.repository";
+import {UsersService} from "../../Users/Services/users.service";
 
 export const AuthService = {
-    async login(userDto: LoginDto): Promise<UserAuthType> {
+    async login(userDto: AuthTypes): Promise<UserAuthType> {
         const {loginOrEmail, password} = userDto;
 
-        const user = await UsersRepository.findUser(loginOrEmail)
+        const user = await UsersService.findUser(loginOrEmail)
         if (!user) throw new authError('Пользователь не найден.', 'loginOrEmail')
 
         const passwordMatch = await bcrypt.compare(password, user.password);
