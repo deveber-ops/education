@@ -10,10 +10,10 @@ const registrationRepository = {
       const db = database.getDB();
       const now = /* @__PURE__ */ new Date();
       const { email, login, password } = userData;
-      const existingUser = await UsersService.findUser(email);
-      if (existingUser) {
-        throw new verificationError("\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C \u0441 \u0442\u0430\u043A\u0438\u043C email \u0443\u0436\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442", "email");
-      }
+      const existingUserForEmail = await UsersService.findUser(email);
+      const existingUserForLogin = await UsersService.findUser(login);
+      if (existingUserForEmail) throw new verificationError("\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C \u0441 \u0442\u0430\u043A\u0438\u043C email \u0443\u0436\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442", "email");
+      if (existingUserForLogin) throw new verificationError("\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C \u0441 \u0442\u0430\u043A\u0438\u043C login \u0443\u0436\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442", "login");
       const salt = await bcrypt.genSalt(10);
       const passwordHash = await bcrypt.hash(password, salt);
       await db.insert(registrationSessions).values({
