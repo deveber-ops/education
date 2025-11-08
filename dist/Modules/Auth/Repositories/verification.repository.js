@@ -2,7 +2,6 @@ import database from '../../../Database/database.js';
 import { and, eq, gt } from "drizzle-orm";
 import { registrationSessions } from '../../../Database/schema.js';
 import bcrypt from "bcrypt";
-import { UsersRepository } from '../../Users/Repositories/users.repository.js';
 const registrationRepository = {
   async createSession(userData, verificationCode, expiresAt) {
     const { email, login, password } = userData;
@@ -17,11 +16,6 @@ const registrationRepository = {
       lastSentAt: now,
       expiresAt
     });
-    try {
-      await UsersRepository.create(userData);
-    } catch (error) {
-      throw error;
-    }
     if (!session) {
       throw new Error("Failed to create registration session");
     }

@@ -3,6 +3,7 @@ import { verificationError } from "../../../Core/Errors/verification.errors";
 import { registrationServices } from "../Services/registrationSession.service";
 import { sendVerificationEmail } from "../../../Core/Mailer/mailer";
 import { HttpStatus } from "../../../Core/Types/httpStatuses.enum";
+import {UsersRepository} from "../../Users/Repositories/users.repository";
 
 export const registrationHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -19,6 +20,12 @@ export const registrationHandler = async (req: Request, res: Response, next: Nex
             await registrationServices.deleteSession(code);
             req.isVerified = true;
             return res.sendStatus(HttpStatus.NoContent)
+        }
+
+        try {
+            await UsersRepository.create({login, email, password});
+        } catch (error: any) {
+            return next(new verificationError("Пользователь с таким email уже существует.", "user"));
         }
 
         const activeSession = await registrationServices.getActiveSessionByEmail(email);

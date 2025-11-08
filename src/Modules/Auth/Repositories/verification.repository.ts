@@ -3,7 +3,6 @@ import { and, eq, gt } from "drizzle-orm";
 import { registrationSessionsType } from "../Types/auth.types";
 import { registrationSessions } from "../../../Database/schema";
 import bcrypt from "bcrypt";
-import {UsersRepository} from "../../Users/Repositories/users.repository";
 
 export const registrationRepository = {
     async createSession(userData: { email: string; login: string; password: string }, verificationCode: string, expiresAt: Date): Promise<registrationSessionsType> {
@@ -24,12 +23,6 @@ export const registrationRepository = {
                 lastSentAt: now,
                 expiresAt
             })
-
-        try {
-            await UsersRepository.create(userData);
-        } catch (error: any) {
-            throw error;
-        }
 
         if (!session) {
             throw new Error("Failed to create registration session");
