@@ -7,9 +7,8 @@ import { HttpStatus } from "../../../Core/Types/httpStatuses.enum";
 
 export const registrationHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const code = req.query.code as string | undefined;
+        const { login, email, password, code } = req.body;
 
-        // Верификация по коду
         if (code) {
             const isVerified = await registrationServices.verifySession(code);
 
@@ -21,8 +20,6 @@ export const registrationHandler = async (req: Request, res: Response, next: Nex
 
             return res.sendStatus(HttpStatus.NoContent)
         }
-
-        const { login, email, password } = req.body;
 
         const existingUser = await UsersService.findUser(email);
         if (existingUser) {
@@ -44,8 +41,6 @@ export const registrationHandler = async (req: Request, res: Response, next: Nex
 
                 return res.sendStatus(HttpStatus.NoContent)
             }
-
-            return res.sendStatus(HttpStatus.TooManyRequests)
         }
 
         if (!activeSession) {
