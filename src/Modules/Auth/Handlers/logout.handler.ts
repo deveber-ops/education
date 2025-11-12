@@ -12,7 +12,7 @@ export const logoutHandler = async (req: Request, res: Response, next: NextFunct
         const cookieRefreshToken = req.cookies?.refreshToken;
 
         if (!cookieRefreshToken) {
-            return new authError('Токен продления сессии не передан.', 'refreshToken')
+            return new authError('Токен продления сессии не передан..', 'refreshToken')
         }
 
         await TokensService.deleteRefreshTokenRecord(cookieRefreshToken)
