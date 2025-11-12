@@ -20,7 +20,7 @@ const TokensService = {
     return {
       accessToken: token,
       userData,
-      expires: ACCESS_TOKEN_EXPIRES
+      expires: new Date(Date.now() + ACCESS_TOKEN_EXPIRES * 1e3)
     };
   },
   async genRefreshToken(userData) {
@@ -35,7 +35,7 @@ const TokensService = {
     return {
       refreshToken: token,
       userData,
-      expires: REFRESH_TOKEN_EXPIRES
+      expires: new Date(Date.now() + REFRESH_TOKEN_EXPIRES * 1e3)
     };
   },
   async verifyRefreshToken(userData, refreshToken) {

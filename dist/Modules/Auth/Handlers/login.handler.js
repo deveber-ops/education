@@ -6,12 +6,10 @@ const loginHandler = async (req, res, next) => {
     res.cookie("accessToken", authUser.access.token, {
       httpOnly: true,
       secure: true,
-      sameSite: "strict",
       expires: new Date(authUser.access.expires)
     }).cookie("refreshToken", authUser.refresh.token, {
       httpOnly: true,
       secure: true,
-      sameSite: "strict",
       expires: new Date(authUser.refresh.expires)
     });
     return res.status(HttpStatus.Ok).json({

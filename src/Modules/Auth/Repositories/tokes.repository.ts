@@ -8,6 +8,10 @@ export const TokensRepository = {
         const db = await database.getDB();
 
         await db
+            .delete(userTokens)
+            .where(eq(userTokens.userId, userId))
+
+        await db
             .insert(userTokens)
             .values({userId, token: refreshToken , expiresAt: expires})
 

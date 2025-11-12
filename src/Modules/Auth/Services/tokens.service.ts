@@ -24,7 +24,7 @@ export const TokensService = {
         return {
             accessToken: token,
             userData: userData,
-            expires: ACCESS_TOKEN_EXPIRES,
+            expires: new Date(Date.now() + ACCESS_TOKEN_EXPIRES * 1000),
         }
     },
 
@@ -41,7 +41,7 @@ export const TokensService = {
         return {
             refreshToken: token,
             userData: userData,
-            expires: REFRESH_TOKEN_EXPIRES,
+            expires: new Date(Date.now() + REFRESH_TOKEN_EXPIRES * 1000),
         }
     },
 
