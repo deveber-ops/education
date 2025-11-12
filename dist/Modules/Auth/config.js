@@ -5,6 +5,7 @@ import { validationMiddleware } from '../../Core/Errors/validation.middleware.js
 import { userInputValidation } from '../Users/Middlewares/userInput.validation.middleware.js';
 import { registrationHandler } from './Handlers/registration.handler.js';
 import { refreshTokenHandler } from './Handlers/refreshToken.handler.js';
+import { logoutHandler } from './Handlers/logout.handler.js';
 var config_default = {
   name: "auth",
   path: "/auth",
@@ -20,6 +21,14 @@ var config_default = {
       middlewares: [authValidation, validationMiddleware],
       handler: loginHandler,
       authorization: false
+    },
+    {
+      method: "POST",
+      name: "\u0417\u0430\u0432\u0435\u0440\u0448\u0435\u043D\u0438\u0435 \u0441\u0435\u0430\u043D\u0441\u0430",
+      path: "/logout",
+      middlewares: [],
+      handler: logoutHandler,
+      authorization: true
     },
     {
       method: "POST",

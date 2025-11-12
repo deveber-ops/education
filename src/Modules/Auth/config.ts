@@ -5,6 +5,7 @@ import {validationMiddleware} from "../../Core/Errors/validation.middleware";
 import {userInputValidation} from "../Users/Middlewares/userInput.validation.middleware";
 import {registrationHandler} from "./Handlers/registration.handler";
 import {refreshTokenHandler} from "./Handlers/refreshToken.handler";
+import {logoutHandler} from "./Handlers/logout.handler";
 
 export default {
     name: 'auth',
@@ -21,6 +22,14 @@ export default {
             middlewares: [authValidation, validationMiddleware],
             handler: loginHandler,
             authorization: false,
+        },
+        {
+            method: 'POST',
+            name: 'Завершение сеанса',
+            path: '/logout',
+            middlewares: [],
+            handler: logoutHandler,
+            authorization: true,
         },
         {
             method: 'POST',
