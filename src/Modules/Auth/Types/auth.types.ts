@@ -7,7 +7,8 @@ export interface AuthTypes {
 }
 
 export type UserAuthType = {
-    accessToken: string;
+    access: {token: string, expires: number};
+    refresh: {token: string, expires: number};
 }
 
 export type registrationSessionsType = InferSelectModel<typeof registrationSessions>;

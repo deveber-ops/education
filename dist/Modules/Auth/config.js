@@ -4,6 +4,7 @@ import { authValidation } from './Middlewares/loginValidation.middleware.js';
 import { validationMiddleware } from '../../Core/Errors/validation.middleware.js';
 import { userInputValidation } from '../Users/Middlewares/userInput.validation.middleware.js';
 import { registrationHandler } from './Handlers/registration.handler.js';
+import { refreshTokenHandler } from './Handlers/refreshToken.handler.js';
 var config_default = {
   name: "auth",
   path: "/auth",
@@ -19,6 +20,14 @@ var config_default = {
       middlewares: [authValidation, validationMiddleware],
       handler: loginHandler,
       authorization: false
+    },
+    {
+      method: "POST",
+      name: "\u0412\u0435\u0440\u0438\u0444\u0438\u043A\u0430\u0446\u0438\u044F \u0438 \u043F\u043E\u043B\u0443\u0447\u0435\u043D\u0438\u0435 \u043D\u043E\u0432\u044B\u0445 \u0442\u043E\u043A\u0435\u043D\u043E\u0432 \u0430\u0432\u0442\u043E\u0440\u0438\u0437\u0430\u0446\u0438\u0438",
+      path: "/refresh-token",
+      middlewares: [],
+      handler: refreshTokenHandler,
+      authorization: true
     },
     {
       method: "GET",

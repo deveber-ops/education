@@ -16,7 +16,7 @@ export type User = InferSelectModel<typeof Users>;
 export type UserWithoutPassword = Omit<User, 'password'>;
 export type UserWithStringId = Omit<UserWithoutPassword, 'id'> & { id: string };
 export type UserInputType = InferInsertModel<typeof Users>;
-export type UserInfoType = Omit<UserWithoutPassword, 'createdAt'>;
+export type UserInfoType = Omit<User, 'id' | 'createdAt' | 'password'> & { id: string };
 
 export type UserQueryInput = {
     pageNumber?: number;

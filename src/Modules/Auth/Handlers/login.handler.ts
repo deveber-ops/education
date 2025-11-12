@@ -6,9 +6,20 @@ export const loginHandler = async (req: Request, res: Response, next: NextFuncti
     try {
         const authUser = await AuthService.login(req.body);
 
-        res.cookie('accessToken', authUser.accessToken);
+        res.cookie('accessToken', authUser.access.token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+            expires: new Date(authUser.access.expires),
+        })
+        .cookie('refreshToken', authUser.refresh.token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+            expires: new Date(authUser.refresh.expires),
+        })
         return res.status(HttpStatus.Ok).json({
-            accessToken: authUser.accessToken,
+            accessToken: authUser.access.token,
         })
     } catch (error) {
         next(error);

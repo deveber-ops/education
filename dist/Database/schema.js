@@ -57,7 +57,7 @@ const registrationSessions = mysqlTable("registrationSessions", {
 });
 const userTokens = mysqlTable("User_Tokens", {
   id: int("id").primaryKey().autoincrement(),
-  email: int("userId").notNull().references(() => Users.id, { onDelete: "cascade" }),
+  userId: int("userId").notNull().references(() => Users.id, { onDelete: "cascade" }),
   token: varchar("token", { length: 255 }).notNull(),
   expiresAt: datetime("expiresAt", { fsp: 6 }).notNull(),
   createdAt: datetime("createdAt", { fsp: 6 }).default(sql`CURRENT_TIMESTAMP(6)`)
