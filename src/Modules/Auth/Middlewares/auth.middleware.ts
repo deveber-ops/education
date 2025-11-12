@@ -12,6 +12,7 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
     try {
         const authHeader = req.headers.authorization;
         const cookieToken = req.cookies?.accessToken;
+        const cookieRefreshToken = req.cookies?.refreshToken;
         let accessToken: string | undefined;
         let isBasic = false;
 
@@ -34,7 +35,7 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
             }
         }
 
-        if (!accessToken) {
+        if (!accessToken && !cookieRefreshToken) {
             return next(new authError('Токен авторизации не передан.', 'token'));
         }
 

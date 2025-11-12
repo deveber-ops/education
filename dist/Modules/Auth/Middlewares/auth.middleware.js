@@ -9,6 +9,7 @@ async function authMiddleware(req, res, next) {
   try {
     const authHeader = req.headers.authorization;
     const cookieToken = req.cookies?.accessToken;
+    const cookieRefreshToken = req.cookies?.refreshToken;
     let accessToken;
     let isBasic = false;
     if (authHeader) {
@@ -26,7 +27,7 @@ async function authMiddleware(req, res, next) {
         return next(new authError("\u041D\u0435\u043F\u043E\u0434\u0434\u0435\u0440\u0436\u0438\u0432\u0430\u0435\u043C\u044B\u0439 \u0442\u0438\u043F \u0430\u0432\u0442\u043E\u0440\u0438\u0437\u0430\u0446\u0438\u0438.", "header"));
       }
     }
-    if (!accessToken) {
+    if (!accessToken && !cookieRefreshToken) {
       return next(new authError("\u0422\u043E\u043A\u0435\u043D \u0430\u0432\u0442\u043E\u0440\u0438\u0437\u0430\u0446\u0438\u0438 \u043D\u0435 \u043F\u0435\u0440\u0435\u0434\u0430\u043D.", "token"));
     }
     if (isBasic) {
