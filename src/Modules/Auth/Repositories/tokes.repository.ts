@@ -4,7 +4,7 @@ import {TokenType} from "../Types/token.types";
 import {eq} from "drizzle-orm";
 
 export const TokensRepository = {
-    async createRefreshTokenRecord(userId: number, refreshToken: string, expires: number): Promise<void> {
+    async createRefreshTokenRecord(userId: number, refreshToken: string, expires: Date): Promise<void> {
         const db = await database.getDB();
 
         await db

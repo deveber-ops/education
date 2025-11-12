@@ -61,7 +61,7 @@ export const TokensService = {
         }
     },
 
-    async createRefreshToken(userId: number, refreshToken: string, expires: number) {
+    async createRefreshToken(userId: number, refreshToken: string, expires: Date) {
         await TokensRepository.createRefreshTokenRecord(userId, refreshToken, expires);
     },
 

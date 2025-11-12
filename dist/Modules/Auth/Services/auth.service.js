@@ -16,7 +16,7 @@ const AuthService = {
     };
     const generatedAccessToken = await TokensService.genAccessToken(userData);
     const generatedRefreshToken = await TokensService.genRefreshToken(userData);
-    await TokensService.createRefreshToken(user.id, generatedRefreshToken.refreshToken, generatedRefreshToken.expires);
+    await TokensService.createRefreshToken(user.id, generatedRefreshToken.refreshToken, new Date(generatedRefreshToken.expires));
     return {
       access: { token: generatedAccessToken.accessToken, expires: generatedAccessToken.expires },
       refresh: { token: generatedRefreshToken.refreshToken, expires: generatedRefreshToken.expires }
