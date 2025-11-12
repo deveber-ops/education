@@ -20,12 +20,7 @@ export const refreshTokenHandler = async (req: Request, res: Response, next: Nex
 
         const newTokens = await TokensService.verifyRefreshToken(userData, cookieRefreshToken);
 
-        res.cookie('accessToken', newTokens.access.accessToken, {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'strict',
-            expires: new Date(newTokens.access.expires),
-        }).cookie('refreshToken', newTokens.refresh.refreshToken, {
+        res.cookie('refreshToken', newTokens.refresh.refreshToken, {
                 httpOnly: true,
                 secure: true,
                 sameSite: 'strict',
