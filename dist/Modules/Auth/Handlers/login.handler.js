@@ -3,11 +3,7 @@ import { HttpStatus } from '../../../Core/Types/httpStatuses.enum.js';
 const loginHandler = async (req, res, next) => {
   try {
     const authUser = await AuthService.login(req.body);
-    res.cookie("accessToken", authUser.access.token, {
-      httpOnly: true,
-      secure: true,
-      expires: new Date(authUser.access.expires)
-    }).cookie("refreshToken", authUser.refresh.token, {
+    res.cookie("refreshToken", authUser.refresh.token, {
       httpOnly: true,
       secure: true,
       expires: new Date(authUser.refresh.expires)

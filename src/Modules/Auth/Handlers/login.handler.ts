@@ -6,12 +6,7 @@ export const loginHandler = async (req: Request, res: Response, next: NextFuncti
     try {
         const authUser = await AuthService.login(req.body);
 
-        res.cookie('accessToken', authUser.access.token, {
-            httpOnly: true,
-            secure: true,
-            expires: new Date(authUser.access.expires),
-        })
-        .cookie('refreshToken', authUser.refresh.token, {
+        res.cookie('refreshToken', authUser.refresh.token, {
             httpOnly: true,
             secure: true,
             expires: new Date(authUser.refresh.expires),
