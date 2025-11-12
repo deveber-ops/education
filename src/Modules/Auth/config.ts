@@ -29,7 +29,6 @@ export default {
             path: '/logout',
             middlewares: [],
             handler: logoutHandler,
-            authorization: true,
         },
         {
             method: 'POST',
@@ -37,7 +36,7 @@ export default {
             path: '/refresh-token',
             middlewares: [],
             handler: refreshTokenHandler,
-            authorization: true,
+            authorization: false,
         },
         {
             method: 'GET',

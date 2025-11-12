@@ -27,8 +27,7 @@ var config_default = {
       name: "\u0417\u0430\u0432\u0435\u0440\u0448\u0435\u043D\u0438\u0435 \u0441\u0435\u0430\u043D\u0441\u0430",
       path: "/logout",
       middlewares: [],
-      handler: logoutHandler,
-      authorization: true
+      handler: logoutHandler
     },
     {
       method: "POST",
@@ -36,7 +35,7 @@ var config_default = {
       path: "/refresh-token",
       middlewares: [],
       handler: refreshTokenHandler,
-      authorization: true
+      authorization: false
     },
     {
       method: "GET",
