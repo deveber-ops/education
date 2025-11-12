@@ -21,6 +21,7 @@ export default {
                     await db.execute(sql`TRUNCATE TABLE Posts`);
                     await db.execute(sql`TRUNCATE TABLE Blogs`);
                     await db.execute(sql`TRUNCATE TABLE Users`);
+                    await db.execute(sql`TRUNCATE TABLE User_Tokens`);
                     await db.execute(sql`TRUNCATE TABLE registrationSessions`);
                     await db.execute(sql`SET FOREIGN_KEY_CHECKS = 1`);
                     res.sendStatus(HttpStatus.NoContent);
