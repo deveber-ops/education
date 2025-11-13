@@ -7,7 +7,7 @@ export const refreshTokenHandler = async (req: Request, res: Response, next: Nex
     try {
         const cookieRefreshToken = req.cookies?.refreshToken;
 
-        if (!cookieRefreshToken) return next(new authError('Токен продления сессии не передан.', 'refreshToken'))
+        if (!cookieRefreshToken) return next(new authError('Токен продления сессии не передан..', 'refreshToken'))
 
         const payloadBase64 = cookieRefreshToken.split(".")[1];
         const payloadJson = Buffer.from(payloadBase64, "base64").toString("utf-8");
