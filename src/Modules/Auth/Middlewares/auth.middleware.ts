@@ -10,54 +10,47 @@ export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 export async function authMiddleware(req: Request, res: Response, next: NextFunction) {
     try {
-        const authHeader = req.headers.authorization;
-        const cookieToken = req.cookies?.accessToken;
-        let accessToken: string | undefined;
-        let isBasic = false;
-
-        // 1. Проверка типа авторизации
-        if (authHeader) {
-            const parts = authHeader.split(' ');
-            if (parts.length !== 2) {
-                return next(new authError('Неверный формат авторизации.', 'header'));
-            }
-
-            const [authType, token] = parts;
-
-            if (authType === 'Bearer') {
-                accessToken = token || cookieToken;
-            } else if (authType === 'Basic') {
-                accessToken = token;
-                isBasic = true;
-            } else {
-                return next(new authError('Неподдерживаемый тип авторизации.', 'header'));
-            }
+        const authHeader = req.get("Authorization");
+        if (!authHeader) {
+            return next(new authError("Заголовок Authorization отсутствует.", "header"));
         }
 
-        if (!accessToken) {
-            return next(new authError('Токен авторизации не передан.', 'token'));
+        const headerParts = authHeader.split(" ");
+        if (headerParts.length !== 2) {
+            return next(new authError("Неверный формат заголовка Authorization.", "header"));
         }
 
-        // 2. Basic Auth
-        if (isBasic) {
-            const credentials = Buffer.from(accessToken, 'base64').toString('utf-8');
-            const [username, password] = credentials.split(':');
+        const [authType, token] = headerParts;
+
+        if (authType.toLowerCase() === "basic") {
+            const credentials = Buffer.from(token, "base64").toString("utf-8");
+            const [username, password] = credentials.split(":");
+
+            if (!username || !password) {
+                return next(new authError("Неверный формат Basic токена.", "token"));
+            }
 
             if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
-                return next(new authError('Неверные учетные данные.', 'token'));
+                return next(new authError("Неверные учетные данные.", "token"));
             }
-            return next();
+        } else if (authType.toLowerCase() === "bearer") {
+            try {
+                const payload = jwt.verify(token, ACCESS_TOKEN_SECRET) as { sub?: string | number };
+                if (!payload?.sub) {
+                    return next(new authError("Токен не содержит идентификатор пользователя.", "token"));
+                }
+                (req as any).userId = Number(payload.sub);
+            } catch {
+                return next(new authError("Токен авторизации недействителен или истёк.", "token"));
+            }
+        } else {
+            return next(new authError("Неподдерживаемый тип авторизации.", "header"));
         }
 
-        // 3. Bearer Auth
-        try {
-            const payload = jwt.verify(accessToken, ACCESS_TOKEN_SECRET) as { sub: string | number };
-            (req as any).userId = Number(payload.sub);
-            return next();
-        } catch {
-            return next(new authError('Токен авторизации недействителен.', 'token'));
-        }
+        console.log('Authorized')
+
+        return next();
     } catch {
-        return next(new authError('Ошибка авторизации.', 'token'));
+        return next(new authError("Ошибка авторизации.", "token"));
     }
 }

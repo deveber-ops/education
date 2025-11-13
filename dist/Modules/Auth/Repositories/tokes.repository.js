@@ -10,7 +10,7 @@ const TokensRepository = {
   },
   async getRefreshTokenRecord(refreshToken) {
     const db = await database.getDB();
-    const [tokenRecord] = await db.select(userTokens).findOne(refreshToken).limit(1);
+    const [tokenRecord] = await db.select().from(userTokens).where(eq(userTokens.token, refreshToken)).limit(1);
     return tokenRecord || null;
   },
   async deleteRefreshTokenRecord(refreshToken) {

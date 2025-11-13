@@ -22,8 +22,9 @@ export const TokensRepository = {
         const db = await database.getDB();
 
         const [tokenRecord] = await db
-            .select(userTokens)
-            .findOne(refreshToken)
+            .select()
+            .from(userTokens)
+            .where(eq(userTokens.token, refreshToken))
             .limit(1);
 
         return tokenRecord || null;

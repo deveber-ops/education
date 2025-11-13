@@ -38,17 +38,16 @@ const TokensService = {
       expires: new Date(Date.now() + REFRESH_TOKEN_EXPIRES * 1e3)
     };
   },
-  async verifyRefreshToken(userData, refreshToken) {
+  async verifyRefreshToken(refreshToken) {
+    let verified = false;
     const tokenRecord = await this.getRefreshTokenRecord(refreshToken);
-    if (!tokenRecord) throw new authError("\u0422\u043E\u043A\u0435\u043D \u043F\u0440\u043E\u0434\u043B\u0435\u043D\u0438\u044F \u0430\u0432\u0442\u043E\u0440\u0438\u0437\u0430\u0446\u0438\u0438 \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D.", "refreshToken");
-    if (tokenRecord.token !== refreshToken || tokenRecord.expiresAt < /* @__PURE__ */ new Date()) {
-      throw new authError("\u0422\u043E\u043A\u0435\u043D \u043F\u0440\u043E\u0434\u043B\u0435\u043D\u0438\u044F \u0430\u0432\u0442\u043E\u0440\u0438\u0437\u0430\u0446\u0438\u0438 \u043D\u0435\u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0442\u0435\u043B\u0435\u043D.", "refreshToken");
+    const payload = jwt.verify(refreshToken, JWT_REFRESH_SECRET);
+    if (!tokenRecord || tokenRecord.token !== refreshToken || tokenRecord.expiresAt < /* @__PURE__ */ new Date() || !payload) {
+      throw new authError("\u0422\u043E\u043A\u0435\u043D \u043F\u0440\u043E\u0434\u043B\u0435\u043D\u0438\u044F \u0430\u0432\u0442\u043E\u0440\u0438\u0437\u0430\u0446\u0438\u0438 \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D \u0438\u043B\u0438 \u043D\u0435\u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0442\u0435\u043B\u0435\u043D.", "refreshToken");
     }
     await this.deleteRefreshTokenRecord(refreshToken);
-    return {
-      access: await this.genAccessToken(userData),
-      refresh: await this.genRefreshToken(userData)
-    };
+    verified = true;
+    return verified;
   },
   async createRefreshToken(userId, refreshToken, expires) {
     await TokensRepository.createRefreshTokenRecord(userId, refreshToken, expires);
