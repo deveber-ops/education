@@ -12,9 +12,7 @@ export const refreshTokenHandler = async (req: Request, res: Response, next: Nex
 
         const cookieRefreshToken = req.cookies?.refreshToken;
 
-        if (!cookieRefreshToken) {
-            return new authError('Токен продления сессии не передан.', 'refreshToken')
-        }
+        if (!cookieRefreshToken) return new authError('Токен продления сессии не передан.', 'refreshToken')
 
         const {createdAt, ...userData} = await UsersService.findOne(userId);
 

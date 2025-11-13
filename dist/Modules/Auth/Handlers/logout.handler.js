@@ -1,6 +1,7 @@
 import { authError } from '../../../Core/Errors/auth.errors.js';
 import { HttpStatus } from '../../../Core/Types/httpStatuses.enum.js';
 import { TokensService } from '../Services/tokens.service.js';
+import { UsersService } from '../../Users/Services/users.service.js';
 const logoutHandler = async (req, res, next) => {
   try {
     const userId = req.userId;
@@ -9,6 +10,8 @@ const logoutHandler = async (req, res, next) => {
     if (!cookieRefreshToken) {
       return new authError("\u0422\u043E\u043A\u0435\u043D \u043F\u0440\u043E\u0434\u043B\u0435\u043D\u0438\u044F \u0441\u0435\u0441\u0441\u0438\u0438 \u043D\u0435 \u043F\u0435\u0440\u0435\u0434\u0430\u043D..", "refreshToken");
     }
+    const { createdAt, ...userData } = await UsersService.findOne(userId);
+    await TokensService.verifyRefreshToken(userData, cookieRefreshToken);
     await TokensService.deleteRefreshTokenRecord(cookieRefreshToken);
     const cookieOptions = {
       httpOnly: true,
