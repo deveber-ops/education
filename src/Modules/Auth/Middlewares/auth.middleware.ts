@@ -36,9 +36,6 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
         } else if (authType.toLowerCase() === "bearer") {
             try {
                 const payload = jwt.verify(token, ACCESS_TOKEN_SECRET) as { sub?: string | number };
-                if (!payload?.sub) {
-                    return next(new authError("Токен не содержит идентификатор пользователя.", "token"));
-                }
                 (req as any).userId = Number(payload.sub);
             } catch {
                 return next(new authError("Токен авторизации недействителен или истёк.", "token"));

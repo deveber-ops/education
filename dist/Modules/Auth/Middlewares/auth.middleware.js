@@ -28,9 +28,6 @@ async function authMiddleware(req, res, next) {
     } else if (authType.toLowerCase() === "bearer") {
       try {
         const payload = jwt.verify(token, ACCESS_TOKEN_SECRET);
-        if (!payload?.sub) {
-          return next(new authError("\u0422\u043E\u043A\u0435\u043D \u043D\u0435 \u0441\u043E\u0434\u0435\u0440\u0436\u0438\u0442 \u0438\u0434\u0435\u043D\u0442\u0438\u0444\u0438\u043A\u0430\u0442\u043E\u0440 \u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044F.", "token"));
-        }
         req.userId = Number(payload.sub);
       } catch {
         return next(new authError("\u0422\u043E\u043A\u0435\u043D \u0430\u0432\u0442\u043E\u0440\u0438\u0437\u0430\u0446\u0438\u0438 \u043D\u0435\u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0442\u0435\u043B\u0435\u043D \u0438\u043B\u0438 \u0438\u0441\u0442\u0451\u043A.", "token"));
