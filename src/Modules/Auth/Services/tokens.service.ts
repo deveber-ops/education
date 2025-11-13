@@ -45,19 +45,21 @@ export const TokensService = {
         }
     },
 
-    async verifyRefreshToken(refreshToken: string) {
-        let verified = false;
-        const tokenRecord = await this.getRefreshTokenRecord(refreshToken);
-        const payload = jwt.verify(refreshToken, JWT_REFRESH_SECRET)
+    async verifyRefreshToken(refreshToken: string): Promise<boolean> {
+        try {
+            const tokenRecord = await this.getRefreshTokenRecord(refreshToken);
 
-        if (!tokenRecord || tokenRecord.token !== refreshToken || tokenRecord.expiresAt < new Date() || !payload) {
-            throw new authError('Токен продления авторизации не найден или недействителен.', 'refreshToken')
+            if (!tokenRecord || tokenRecord.token !== refreshToken || tokenRecord.expiresAt < new Date())
+                throw new authError('Токен продления авторизации не найден или недействителен.', 'refreshToken');
+
+            jwt.verify(refreshToken, JWT_REFRESH_SECRET);
+
+            await this.deleteRefreshTokenRecord(refreshToken);
+
+            return true;
+        } catch (err) {
+            throw new authError('Ошибка проверки токена.', 'refreshToken');
         }
-
-        await this.deleteRefreshTokenRecord(refreshToken)
-        verified = true;
-
-        return verified
     },
 
     async createRefreshToken(userId: number, refreshToken: string, expires: Date) {
