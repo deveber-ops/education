@@ -35,8 +35,16 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
             }
         } else if (authType.toLowerCase() === "bearer") {
             try {
-                const payload = jwt.verify(token, ACCESS_TOKEN_SECRET) as { sub?: string | number };
-                (req as any).userId = Number(payload.sub);
+                jwt.verify(token, ACCESS_TOKEN_SECRET);
+                const payloadBase64 = token.split(".")[1];
+                const payloadJson = Buffer.from(payloadBase64, "base64").toString("utf-8");
+                const payload = JSON.parse(payloadJson);
+                (req as any).userInfo = {
+                    userId: payload.userData.id,
+                    email: payload.userData.email,
+                    login: payload.userData.login,
+                }
+
             } catch {
                 return next(new authError("Токен авторизации недействителен или истёк.", "token"));
             }
