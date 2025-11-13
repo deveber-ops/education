@@ -6,7 +6,7 @@ const loginHandler = async (req, res, next) => {
     res.cookie("refreshToken", authUser.refresh.token, {
       httpOnly: true,
       secure: true,
-      expires: new Date(authUser.refresh.expires)
+      expires: authUser.refresh.expires
     });
     return res.status(HttpStatus.Ok).json({
       accessToken: authUser.access.token

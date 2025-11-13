@@ -11,6 +11,7 @@ const refreshTokenHandler = async (req, res, next) => {
     await TokensService.verifyRefreshToken(cookieRefreshToken);
     const newAccessToken = await TokensService.genAccessToken(payload.userData);
     const newRefreshToken = await TokensService.genRefreshToken(payload.userData);
+    await TokensService.createRefreshToken(payload.userData.id, newRefreshToken.refreshToken, newRefreshToken.expires);
     res.cookie("refreshToken", newRefreshToken.refreshToken, {
       httpOnly: true,
       secure: true,

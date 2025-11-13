@@ -9,7 +9,7 @@ export const loginHandler = async (req: Request, res: Response, next: NextFuncti
         res.cookie('refreshToken', authUser.refresh.token, {
             httpOnly: true,
             secure: true,
-            expires: new Date(authUser.refresh.expires),
+            expires: authUser.refresh.expires,
         })
         return res.status(HttpStatus.Ok).json({
             accessToken: authUser.access.token,

@@ -41,7 +41,7 @@ export const TokensService = {
         return {
             refreshToken: token,
             userData: userData,
-            expires: new Date(Date.now() + REFRESH_TOKEN_EXPIRES * 1000),
+            expires: new Date(Date.now() + (REFRESH_TOKEN_EXPIRES * 1000)),
         }
     },
 
