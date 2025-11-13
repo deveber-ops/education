@@ -23,7 +23,7 @@ async function authMiddleware(req, res, next) {
         return next(new authError("\u041D\u0435\u0432\u0435\u0440\u043D\u044B\u0439 \u0444\u043E\u0440\u043C\u0430\u0442 Basic \u0442\u043E\u043A\u0435\u043D\u0430.", "token"));
       }
       if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
-        return next(new authError("\u041D\u0435\u0432\u0435\u0440\u043D\u044B\u0435 \u0443\u0447\u0435\u0442\u043D\u044B\u0435 \u0434\u0430\u043D\u043D\u044B\u0435.", "token"));
+        return next(new authError("\u041D\u0435\u0432\u0435\u0440\u043D\u044B\u0435 \u0443\u0447\u0435\u0442\u043D\u044B\u0435 \u0434\u0430\u043D\u043D\u044B\u0435..", "token"));
       }
     } else if (authType.toLowerCase() === "bearer") {
       try {

@@ -31,7 +31,7 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
             }
 
             if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
-                return next(new authError("Неверные учетные данные.", "token"));
+                return next(new authError("Неверные учетные данные..", "token"));
             }
         } else if (authType.toLowerCase() === "bearer") {
             try {
